@@ -5,11 +5,12 @@
          eager: true,
       },
    );
+
    let urls: string[] = [];
 
    for (const image in images) {
       if (Object.prototype.hasOwnProperty.call(images, image)) {
-         const url = images[image].default;
+         let url = (images[image] as { default: string }).default;
          urls.push(url);
       }
    }
@@ -18,8 +19,10 @@
 <div class="screenshots">
    <h1>Screenshots</h1>
    <div class="grid">
-      {#each urls as url}
-         <img src={url} alt="Screenshot of {url}" />
+      {#each urls as url, index}
+         <a href={`/screenshots/${index + 1}`}>
+            <img src={url} alt="Screenshot" />
+         </a>
       {/each}
    </div>
 </div>
@@ -37,9 +40,12 @@
          display: grid;
          grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
          gap: 1rem;
+         width: 100%;
 
          img {
             width: 100%;
+            opacity: 1;
+            transition: filter 500ms;
          }
       }
    }

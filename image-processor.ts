@@ -2,9 +2,13 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 
-const deleteAndRecreateOutputDir = (outDir: string) => {
+const deleteAndRecreateOutputDir = async (outDir: string) => {
    if (fs.existsSync(outDir)) {
-      fs.rmSync(outDir, { recursive: true });
+      try {
+         fs.rmSync(outDir, { recursive: true });
+      } catch (error) {
+         console.error(`Failed to remove directory ${outDir}:`, error);
+      }
    }
    fs.mkdirSync(outDir, { recursive: true });
 };
@@ -14,15 +18,15 @@ const processImagesRecursively = (dir: string, outDir: string) => {
 
    for (const item of items) {
       const fullPath = path.join(dir, item);
-      const relativePath = path.relative(dir, fullPath); // Get relative path to mirror folder structure
-      const outputFilePath = path.join(outDir, relativePath);
+      const outputFilePath = path.join(outDir, item); // Directly using item
 
       if (fs.statSync(fullPath).isDirectory()) {
          // Recursively process subdirectories
-         if (!fs.existsSync(outputFilePath)) {
-            fs.mkdirSync(outputFilePath, { recursive: true });
+         const newOutDir = path.join(outDir, item); // Create a new output directory
+         if (!fs.existsSync(newOutDir)) {
+            fs.mkdirSync(newOutDir, { recursive: true });
          }
-         processImagesRecursively(fullPath, outputFilePath);
+         processImagesRecursively(fullPath, newOutDir); // Pass the new output directory
       } else if (item.endsWith(".jpg") || item.endsWith(".png")) {
          sharp(fullPath)
             .resize(100)
@@ -35,21 +39,141 @@ const processImagesRecursively = (dir: string, outDir: string) => {
    }
 };
 
-const imagePreprocessor = async () => {
+async function cropImages(inputDir: string, outputDir: string) {
+   const files = fs.readdirSync(inputDir);
+
+   for (const file of files) {
+      const inputFilePath = path.join(inputDir, file);
+      const outputFilePath = path.join(outputDir, file);
+
+      if (fs.statSync(inputFilePath).isFile()) {
+         try {
+            const image = sharp(inputFilePath);
+            const { data, info } = await image
+               .raw()
+               .toBuffer({ resolveWithObject: true });
+
+            const { width, height, channels } = info;
+
+            const isBlack = (
+               r: number,
+               g: number,
+               b: number,
+               threshold: number = 10,
+            ) => {
+               return r < threshold && g < threshold && b < threshold;
+            };
+
+            let top = 0,
+               bottom = height - 1,
+               left = 0,
+               right = width - 1;
+
+            // Find top
+            for (let y = 0; y < height; y++) {
+               let rowIsBlack = true;
+               for (let x = 0; x < width; x++) {
+                  const idx = (y * width + x) * channels;
+                  if (!isBlack(data[idx], data[idx + 1], data[idx + 2])) {
+                     rowIsBlack = false;
+                     break;
+                  }
+               }
+               if (!rowIsBlack) {
+                  top = y;
+                  break;
+               }
+            }
+
+            // Find bottom
+            for (let y = height - 1; y >= 0; y--) {
+               let rowIsBlack = true;
+               for (let x = 0; x < width; x++) {
+                  const idx = (y * width + x) * channels;
+                  if (!isBlack(data[idx], data[idx + 1], data[idx + 2])) {
+                     rowIsBlack = false;
+                     break;
+                  }
+               }
+               if (!rowIsBlack) {
+                  bottom = y;
+                  break;
+               }
+            }
+
+            // Find left
+            for (let x = 0; x < width; x++) {
+               let colIsBlack = true;
+               for (let y = 0; y < height; y++) {
+                  const idx = (y * width + x) * channels;
+                  if (!isBlack(data[idx], data[idx + 1], data[idx + 2])) {
+                     colIsBlack = false;
+                     break;
+                  }
+               }
+               if (!colIsBlack) {
+                  left = x;
+                  break;
+               }
+            }
+
+            // Find right
+            for (let x = width - 1; x >= 0; x--) {
+               let colIsBlack = true;
+               for (let y = 0; y < height; y++) {
+                  const idx = (y * width + x) * channels;
+                  if (!isBlack(data[idx], data[idx + 1], data[idx + 2])) {
+                     colIsBlack = false;
+                     break;
+                  }
+               }
+               if (!colIsBlack) {
+                  right = x;
+                  break;
+               }
+            }
+
+            const croppedImage = sharp(inputFilePath).extract({
+               left,
+               top,
+               width: right - left + 1,
+               height: bottom - top + 1,
+            });
+
+            await croppedImage.toFile(outputFilePath);
+         } catch (err) {
+            console.error(`Failed to process image: ${file}`, err);
+         }
+      }
+   }
+}
+
+const imageCropper = async () => {
+   const inputDir = path.resolve("./src/lib/images/screenshots/");
+   const outputDir = path.resolve("./src/lib/images/screenshots/cropped/");
+
+   await deleteAndRecreateOutputDir(outputDir);
+   await cropImages(inputDir, outputDir);
+   console.log("Image cropping complete.");
+};
+
+const imageSizer = async () => {
    const inputDir = path.resolve("static/images");
    const outputDir = path.resolve("static/low-res");
 
-   deleteAndRecreateOutputDir(outputDir); // Clear and recreate output directory
-   processImagesRecursively(inputDir, outputDir); // Start processing
-   console.log("Image preprocessing complete.");
+   await deleteAndRecreateOutputDir(outputDir);
+   await processImagesRecursively(inputDir, outputDir);
+
+   console.log("Image sizing complete.");
 };
 
 // Vite plugin
 export default function imageProcessingPlugin() {
    return {
       name: "vite-image-processing-plugin",
-      buildStart() {
-         imagePreprocessor();
+      async buildStart() {
+         await imageCropper();
+         await imageSizer();
       },
    };
 }
