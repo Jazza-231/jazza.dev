@@ -1,7 +1,7 @@
-export { default as Arrow } from "./Icons/Arrow.svelte";
-export { default as Home } from "./Icons/Home.svelte";
-export { default as Folder } from "./Icons/Folder.svelte";
-export { default as Link } from "./Icons/Link.svelte";
-export { default as Post } from "./Icons/Post.svelte";
-export { default as Image } from "./Icons/Image.svelte";
-export { default as Three } from "./Icons/Three.svelte";
+export { default as Arrow } from "./icons/Arrow.svelte";
+export { default as Home } from "./icons/Home.svelte";
+export { default as Folder } from "./icons/Folder.svelte";
+export { default as Link } from "./icons/Link.svelte";
+export { default as Post } from "./icons/Post.svelte";
+export { default as Image } from "./icons/Image.svelte";
+export { default as Three } from "./icons/Three.svelte";

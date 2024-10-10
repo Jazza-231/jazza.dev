@@ -18,7 +18,7 @@
 </script>
 
 <img
-   src="/low-res-images/{imagePath}"
+   src="/low-res/{imagePath}"
    alt="Image for {header}"
    class="blur"
    bind:this={image}

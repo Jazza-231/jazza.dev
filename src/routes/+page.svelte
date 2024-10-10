@@ -48,14 +48,14 @@
       <div class="bentos">
          <Bento
             header="Scratch Addons"
-            imagePath="ScratchAddons.png"
+            imagePath="bento/ScratchAddons.png"
             content="A collection of addons for the kids' coding website; Scratch."
             href="/projects/scratch-addons"
             area="a"
          />
          <Bento
             header="MediaScout"
-            imagePath="MediaScout.png"
+            imagePath="bento/MediaScout.png"
             content="A movie explorer and player designed to just be...better"
             href="/projects/mediascout"
             short
@@ -65,7 +65,7 @@
          </Bento>
          <Bento
             header="Jazza's Website"
-            imagePath="Website.png"
+            imagePath="bento/Website.png"
             content="A website I made for myself, to showcase my projects and stuff."
             href="/projects/jazzas-website"
             short
@@ -73,7 +73,7 @@
          />
          <Bento
             header="Quickie"
-            imagePath="LoremPicsum.jpg"
+            imagePath="bento/LoremPicsum.jpg"
             content="When you don't have much time, these code lessons are for you."
             href="/projects/quickie"
             area="d"
