@@ -78,6 +78,7 @@
          align-items: center;
          justify-content: center;
          width: 15rem;
+         margin: auto;
       }
 
       :global(img) {
@@ -101,9 +102,12 @@
 
       width: auto;
       height: 20rem;
+      justify-content: center;
+      align-items: center;
 
       &:not(.short) {
          flex-direction: row;
+         align-items: start;
       }
    }
 </style>

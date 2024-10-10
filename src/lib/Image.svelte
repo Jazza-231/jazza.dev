@@ -38,7 +38,7 @@
    }
 
    .blur {
-      filter: blur(0.2rem);
+      filter: blur(0.5rem);
    }
 
    .hidden {
