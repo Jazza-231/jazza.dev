@@ -13,6 +13,8 @@
    let title = $derived(
       [name, $page.url.pathname.split("/")[1]].filter(Boolean).join(" - "),
    );
+
+   const widerPaths = /^\/screenshots\/\d+$/;
 </script>
 
 <svelte:head>
@@ -21,8 +23,21 @@
 
 <Header></Header>
 
-<div class="main">
+<div class="main" class:wide={$page.url.pathname.match(widerPaths)}>
    {@render children()}
 </div>
 
 <Footer></Footer>
+
+<style>
+   .main {
+      max-width: 60rem;
+      margin: auto;
+      margin-top: 2rem;
+      padding: 0 2rem;
+   }
+
+   .main.wide {
+      max-width: 100rem;
+   }
+</style>

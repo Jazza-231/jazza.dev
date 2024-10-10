@@ -20,12 +20,33 @@
    }
 </script>
 
+<div class="back">
+   <a href="/screenshots">Back</a>
+</div>
+
 <div class="screenshot">
    <img src={urls[+id - 1]} alt="Screenshot" />
 </div>
 
 <style>
-   img {
+   .back {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+
+      a {
+         font-size: 1.5rem;
+         padding: 0rem 1rem;
+      }
+   }
+   .screenshot {
+      height: 100%;
       width: 100%;
+      display: flex;
+      margin-bottom: 1rem;
+   }
+   img {
+      max-height: 70vh;
+      max-width: 100%;
    }
 </style>

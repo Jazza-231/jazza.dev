@@ -38,13 +38,6 @@ body {
    }
 }
 
-.main {
-   max-width: 60rem;
-   min-width: 50rem;
-   margin: auto;
-   margin-top: 2rem;
-}
-
 .colour-effect {
    background: linear-gradient(90deg, var(--primary), var(--accent));
    background-clip: text;
