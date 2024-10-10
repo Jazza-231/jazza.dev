@@ -31,7 +31,7 @@
 
 <style>
    .main {
-      max-width: 60rem;
+      max-width: 65rem;
       margin: auto;
       margin-top: 2rem;
       padding: 0 2rem;

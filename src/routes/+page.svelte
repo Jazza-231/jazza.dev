@@ -4,6 +4,9 @@
    const { age } = data;
 
    import { Arrow } from "$lib/Icons";
+
+   const imagePath = "/images/bento/";
+   const lowResPath = "/low-res/bento/";
 </script>
 
 <!-- PLEASE DO REACTIVITY SOMETIME https://www.youtube.com/watch?v=x4u1yp3Msao -->
@@ -48,14 +51,18 @@
       <div class="bentos">
          <Bento
             header="Scratch Addons"
-            imagePath="bento/ScratchAddons.png"
+            {imagePath}
+            {lowResPath}
+            imageName="ScratchAddons.png"
             content="A collection of addons for the kids' coding website; Scratch."
             href="/projects/scratch-addons"
             area="a"
          />
          <Bento
             header="MediaScout"
-            imagePath="bento/MediaScout.png"
+            {imagePath}
+            {lowResPath}
+            imageName="MediaScout.png"
             content="A movie explorer and player designed to just be...better"
             href="/projects/mediascout"
             short
@@ -65,7 +72,9 @@
          </Bento>
          <Bento
             header="Jazza's Website"
-            imagePath="bento/Website.png"
+            {imagePath}
+            {lowResPath}
+            imageName="Website.png"
             content="A website I made for myself, to showcase my projects and stuff."
             href="/projects/jazzas-website"
             short
@@ -73,7 +82,9 @@
          />
          <Bento
             header="Quickie"
-            imagePath="bento/LoremPicsum.jpg"
+            {imagePath}
+            {lowResPath}
+            imageName="LoremPicsum.jpg"
             content="When you don't have much time, these code lessons are for you."
             href="/projects/quickie"
             area="d"

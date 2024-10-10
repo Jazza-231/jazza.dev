@@ -158,8 +158,14 @@ const imageCropper = async () => {
 };
 
 const imageSizer = async () => {
-   const inputDir = path.resolve("static/images");
-   const outputDir = path.resolve("static/low-res");
+   let inputDir = path.resolve("static/images");
+   let outputDir = path.resolve("static/low-res");
+
+   await deleteAndRecreateOutputDir(outputDir);
+   await processImagesRecursively(inputDir, outputDir);
+
+   inputDir = path.resolve("src/lib/images/screenshots/cropped");
+   outputDir = path.resolve("src/lib/images/screenshots/low-res");
 
    await deleteAndRecreateOutputDir(outputDir);
    await processImagesRecursively(inputDir, outputDir);

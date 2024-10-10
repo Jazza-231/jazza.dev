@@ -2,7 +2,7 @@
    import { browser } from "$app/environment";
 
    const props = $props();
-   const { header, imagePath } = props;
+   const { header, imagePath, lowResPath, imageName } = props;
 
    let loaded: () => void = $state(() => {});
    let srcLoader: HTMLImageElement;
@@ -18,13 +18,13 @@
 </script>
 
 <img
-   src="/low-res/{imagePath}"
+   src={lowResPath + imageName}
    alt="Image for {header}"
    class="blur"
    bind:this={image}
 />
 <img
-   src="/images/{imagePath}"
+   src={imagePath + imageName}
    alt="Image for {header}"
    class="hidden"
    onload={loaded}

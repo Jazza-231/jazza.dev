@@ -1,7 +1,17 @@
 <script lang="ts">
    import Image from "./Image.svelte";
    const props = $props();
-   const { header, imagePath, short, content, href, area, children } = props;
+   const {
+      header,
+      imagePath,
+      short,
+      content,
+      href,
+      area,
+      children,
+      lowResPath,
+      imageName,
+   } = props;
 
    const bentoClass = header.toLowerCase().replaceAll(" ", "-");
 </script>
@@ -18,7 +28,7 @@
          {/if}
       </div>
       <div class="image-container">
-         <Image {header} {imagePath} />
+         <Image {header} {imagePath} {lowResPath} {imageName} />
       </div>
    </a>
 </div>
