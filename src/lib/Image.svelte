@@ -2,7 +2,7 @@
    import { browser } from "$app/environment";
 
    const props = $props();
-   const { header, imagePath, lowResPath, imageName } = props;
+   const { header, imagePath, lowResPath, imageName = "" } = props;
 
    let loaded: () => void = $state(() => {});
    let srcLoader: HTMLImageElement;

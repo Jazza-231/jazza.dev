@@ -2,31 +2,28 @@
    import Image from "$lib/Image.svelte";
 
    const images = import.meta.glob(
-      "../../../static/images/screenshots/*.{png,jpg}",
+      "/src/lib/images/screenshots/cropped/*.{png,jpg}",
       {
-         eager: true,
+         eager: true, // Load immediately
+         query: "?url", // Use the query for URLs
+         import: "default", // Get the default export (the URL)
       },
    );
 
    let urls: string[] = [];
-   let names: string[] = [];
 
    for (const image in images) {
       if (Object.prototype.hasOwnProperty.call(images, image)) {
-         let url = (images[image] as { default: string }).default;
+         let url = images[image] as string;
+
          urls.push(url);
       }
    }
 
-   urls.forEach((url) => {
-      const split = url.split("/");
-      names.push(split[split.length - 1]);
-   });
-
    let modal: HTMLDivElement;
    let modalBack: HTMLDivElement;
    function showImage(index: number) {
-      modal.style.backgroundImage = `url(/images/screenshots/cropped/${names[index]})`;
+      modal.style.backgroundImage = `url(${urls[index]})`;
       modal.style.display = "block";
       modalBack.style.display = "block";
 
@@ -41,7 +38,7 @@
 <div class="screenshots">
    <h1>Screenshots</h1>
    <div class="grid">
-      {#each names as name, index}
+      {#each urls as url, index}
          <button
             class="image-container"
             onclick={() => {
@@ -49,10 +46,9 @@
             }}
          >
             <Image
-               imagePath="/images/screenshots/cropped/"
-               lowResPath="/low-res/screenshots/cropped/"
-               imageName={name}
-               header="Test"
+               imagePath={url}
+               lowResPath={url.replace("images", "low-res")}
+               header="screenshots"
             />
          </button>
       {/each}
