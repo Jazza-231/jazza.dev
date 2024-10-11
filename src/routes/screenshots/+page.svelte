@@ -1,9 +1,12 @@
 <script lang="ts">
    import Image from "$lib/Image.svelte";
 
-   const images = import.meta.glob("$lib/images/screenshots/*.{png,jpg}", {
-      eager: true,
-   });
+   const images = import.meta.glob(
+      "../../../static/images/screenshots/*.{png,jpg}",
+      {
+         eager: true,
+      },
+   );
 
    let urls: string[] = [];
    let names: string[] = [];
@@ -23,7 +26,7 @@
    let modal: HTMLDivElement;
    let modalBack: HTMLDivElement;
    function showImage(index: number) {
-      modal.style.backgroundImage = `url(/src/lib/images/screenshots/cropped/${names[index]})`;
+      modal.style.backgroundImage = `url(/images/screenshots/cropped/${names[index]})`;
       modal.style.display = "block";
       modalBack.style.display = "block";
 
@@ -46,8 +49,8 @@
             }}
          >
             <Image
-               imagePath="/src/lib/images/screenshots/cropped/"
-               lowResPath="/src/lib/images/screenshots/low-res/"
+               imagePath="/images/screenshots/cropped/"
+               lowResPath="/low-res/screenshots/cropped/"
                imageName={name}
                header="Test"
             />
