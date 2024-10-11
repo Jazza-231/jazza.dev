@@ -10,13 +10,31 @@
       },
    );
 
+   const lowResImages = import.meta.glob(
+      "/src/lib/low-res/screenshots/cropped/*.{png,jpg}",
+      {
+         eager: true, // Load immediately
+         query: "?url", // Use the query for URLs
+         import: "default", // Get the default export (the URL)
+      },
+   );
+
    let urls: string[] = [];
+   let lowResUrls: string[] = [];
 
    for (const image in images) {
       if (Object.prototype.hasOwnProperty.call(images, image)) {
-         let url = images[image] as string;
+         const url = images[image] as string;
 
          urls.push(url);
+      }
+   }
+
+   for (const image in lowResImages) {
+      if (Object.prototype.hasOwnProperty.call(lowResImages, image)) {
+         const url = lowResImages[image] as string;
+
+         lowResUrls.push(url);
       }
    }
 
@@ -47,7 +65,7 @@
          >
             <Image
                imagePath={url}
-               lowResPath={url.replace("images", "low-res")}
+               lowResPath={lowResUrls[index]}
                header="screenshots"
             />
          </button>
