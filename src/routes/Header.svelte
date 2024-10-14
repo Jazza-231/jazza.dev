@@ -2,39 +2,23 @@
    import { page } from "$app/stores";
 </script>
 
+{#snippet link(href: string, text: string)}
+   {@const path = $page.url.pathname.split("/")[1]}
+   {@const selected = path === href.split("/")[1]}
+
+   <li>
+      <a {href} class:selected>{text}</a>
+   </li>
+{/snippet}
+
 <nav class="header">
    <ul>
-      <li>
-         <a href="/" class:selected={$page.url.pathname === "/"}>Home</a>
-      </li>
-      <li>
-         <a
-            href="/projects"
-            class:selected={$page.url.pathname === "/projects"}
-         >
-            Projects
-         </a>
-      </li>
-      <li>
-         <a href="/links" class:selected={$page.url.pathname === "/links"}>
-            Links
-         </a>
-      </li>
-      <li>
-         <a href="/posts" class:selected={$page.url.pathname === "/posts"}>
-            Posts
-         </a>
-      </li>
-
+      {@render link("/", "Home")}
+      {@render link("/projects", "Projects")}
+      {@render link("/links", "Links")}
+      {@render link("/posts", "Posts")}
       {#if $page.url.pathname === "/secret/onlyfans"}
-         <li>
-            <a
-               href="/secret/onlyfans"
-               class:selected={$page.url.pathname === "/secret/onlyfans"}
-            >
-               Only Fans
-            </a>
-         </li>
+         {@render link("/secret/onlyfans", "Only Fans")}
       {/if}
    </ul>
 </nav>
@@ -68,17 +52,19 @@
          margin: 0.3rem;
          transition:
             color 200ms,
-            font-size 200ms;
+            transform 200ms;
          font-size: 1.5rem;
+         transform: scale(1);
+         display: inline-block;
 
          &:hover {
             color: var(--text-800);
-            font-size: 1.7rem;
+            transform: scale(1.1);
          }
 
          &.selected {
             color: var(--text);
-            font-size: 2rem;
+            transform: scale(1.3);
          }
       }
    }

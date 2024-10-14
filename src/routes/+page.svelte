@@ -178,6 +178,7 @@
    .list {
       list-style: none;
       padding: 0;
+      line-height: 1.7rem;
 
       .indented {
          padding-left: 1rem;
