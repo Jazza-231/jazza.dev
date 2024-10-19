@@ -40,6 +40,7 @@
       "@sveltejs/adapter-cloudflare": "^4.7.2",
       "@threlte/core": "8.0.0-next.17",
       "@threlte/extras": "9.0.0-next.23",
+      "detect-gpu": "^5.0.52",
       "gsap": "^3.12.5",
       "sharp": "^0.33.5",
       "three": "^0.168.0"

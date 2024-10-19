@@ -1,6 +1,23 @@
 <script lang="ts">
-   import { T, useTask, useThrelte } from "@threlte/core";
+   import { T, useTask } from "@threlte/core";
    import { useGltf, Text3DGeometry, Align } from "@threlte/extras";
+   import * as detectGPU from "detect-gpu";
+
+   const { getGPUTier } = detectGPU;
+   let model = $state(0);
+
+   (async () => {
+      console.log("Start gpu test");
+
+      const gpuTier = await getGPUTier();
+
+      console.log(gpuTier);
+
+      if (gpuTier.tier < 2) {
+         model = 1;
+         console.warn("Low power GPU detected, using low quality model");
+      } else model = 0;
+   })();
 
    // svelte-ignore non_reactive_update
    let rotate = false;
@@ -11,6 +28,37 @@
 
    const laptopEl = document.querySelector(".laptop");
    const loadingEl = document.querySelector(".loading");
+
+   const models = [
+      "/models/Pro laptop model.glb",
+      "/models/Laptop modelling attempt.glb",
+   ];
+   type ModelsData = {
+      scale: number;
+      position: number;
+      text1: [x: number, y: number, z: number];
+      text2: [x: number, y: number, z: number];
+      text3: [x: number, y: number, z: number];
+      text4: [x: number, y: number, z: number];
+   };
+   const modelsData: ModelsData[] = [
+      {
+         scale: 1,
+         position: 0.4,
+         text1: [0, 2.4, -0.7],
+         text2: [1, 1.7, -0.65],
+         text3: [-0.4, 0.6, 0.8],
+         text4: [0.2, 0.6, -0.8],
+      },
+      {
+         scale: 7,
+         position: 1.5,
+         text1: [0, 2.3, -0.5],
+         text2: [1, 1.7, -0.31],
+         text3: [-0.4, 0.75, 1],
+         text4: [0.2, 0.9, -0.2],
+      },
+   ];
 </script>
 
 <T.PerspectiveCamera
@@ -31,7 +79,7 @@
 
 <T.AmbientLight intensity={1} />
 
-{#await useGltf("/models/Laptop modelling attempt.glb") then gltf}
+{#await useGltf(models[model]) then gltf}
    <!-- Traverse the gltf.scene to apply shadows to all meshes -->
    {laptopEl?.classList.add("done")}
    {loadingEl?.classList.add("done")}
@@ -44,7 +92,12 @@
             object.receiveShadow = true;
          }
       })}
-      <T is={gltf.scene} position.y={1.5} rotation.y={rotation} scale={7} />
+      <T
+         is={gltf.scene}
+         position.y={modelsData[model].position}
+         rotation.y={rotation}
+         scale={modelsData[model].scale}
+      />
    {/key}
 {/await}
 
@@ -82,27 +135,27 @@
 
 {@render RotatingText(
    [0, rotation, 0],
-   [0, 2.3, -0.5],
+   modelsData[model].text1,
    "Lenovo Legion Pro 7i Gen 8",
 )}
 
 {@render RotatingText(
    [0, rotation, 0],
-   [1, 1.7, -0.31],
+   modelsData[model].text2,
    "240hz, 2560x1600",
    [-0.2, 0, 0],
 )}
 
 {@render RotatingText(
    [0, rotation, 0],
-   [-0.4, 0.75, 1],
+   modelsData[model].text3,
    "2x4TB SSD, 32GB RAM",
    [-Math.PI / 2, 0, 0],
 )}
 
 {@render RotatingText(
    [0, rotation, 0],
-   [0.2, 0.9, -0.2],
+   modelsData[model].text4,
    "RTX 4070, i9-13900hx",
    [0.5, Math.PI, 0],
 )}
