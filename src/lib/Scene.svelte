@@ -1,14 +1,23 @@
 <script lang="ts">
+   // @ts-ignore
+   import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+   // @ts-ignore
+   import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
    import { T, useTask } from "@threlte/core";
-   import { useGltf, Text3DGeometry, Align } from "@threlte/extras";
+   import { Text3DGeometry, Align, OrbitControls } from "@threlte/extras";
    import * as detectGPU from "detect-gpu";
+   import { Object3D } from "three";
+
+   // Setup DRACOLoader
+   const gltfLoader = new GLTFLoader();
+   const dracoLoader = new DRACOLoader();
+   dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+   gltfLoader.setDRACOLoader(dracoLoader);
 
    const { getGPUTier } = detectGPU;
    let model = $state(0);
 
    (async () => {
-      console.log("Start gpu test");
-
       const gpuTier = await getGPUTier();
 
       console.log(gpuTier);
@@ -31,8 +40,9 @@
 
    const models = [
       "/models/Pro laptop model.glb",
-      "/models/Laptop modelling attempt.glb",
+      "/models/Noob laptop model.glb",
    ];
+
    type ModelsData = {
       scale: number;
       position: number;
@@ -41,6 +51,7 @@
       text3: [x: number, y: number, z: number];
       text4: [x: number, y: number, z: number];
    };
+
    const modelsData: ModelsData[] = [
       {
          scale: 1,
@@ -68,7 +79,7 @@
       ref.lookAt(0, 1, 0);
    }}
    zoom={3}
-/>
+></T.PerspectiveCamera>
 
 <T.DirectionalLight
    position={[-5, 20, 3]}
@@ -79,13 +90,12 @@
 
 <T.AmbientLight intensity={1} />
 
-{#await useGltf(models[model]) then gltf}
-   <!-- Traverse the gltf.scene to apply shadows to all meshes -->
+{#await gltfLoader.loadAsync(models[model]) then gltf}
    {laptopEl?.classList.add("done")}
    {loadingEl?.classList.add("done")}
    {(rotate = true)}
    {#key gltf.scene}
-      {gltf.scene.traverse((object) => {
+      {gltf.scene.traverse((object: Object3D) => {
          //@ts-ignore
          if (object.isMesh) {
             object.castShadow = true;
