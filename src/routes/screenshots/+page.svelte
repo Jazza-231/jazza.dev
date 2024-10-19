@@ -4,18 +4,18 @@
    const images = import.meta.glob(
       "/src/lib/images/screenshots/cropped/*.{png,jpg}",
       {
-         eager: true, // Load immediately
-         query: "?url", // Use the query for URLs
-         import: "default", // Get the default export (the URL)
+         eager: true,
+         query: "?url",
+         import: "default",
       },
    );
 
    const lowResImages = import.meta.glob(
       "/src/lib/low-res/screenshots/cropped/*.{png,jpg}",
       {
-         eager: true, // Load immediately
-         query: "?url", // Use the query for URLs
-         import: "default", // Get the default export (the URL)
+         eager: true,
+         query: "?url",
+         import: "default",
       },
    );
 

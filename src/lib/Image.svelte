@@ -36,10 +36,11 @@
 <style>
    figure {
       margin: 0;
-   }
-   img {
-      opacity: 1;
-      transition: blur 500ms;
+      width: 100%;
+      img {
+         opacity: 1;
+         transition: blur 500ms;
+      }
    }
 
    .blur {
