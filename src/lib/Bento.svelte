@@ -86,7 +86,7 @@
          text-decoration: none;
       }
 
-      .image-container:has(img) {
+      .image-container:has(:global(img)) {
          display: flex;
          align-items: center;
          justify-content: center;
@@ -114,7 +114,7 @@
       justify-content: center;
       align-items: center;
 
-      &:not(.short) {
+      &:not(:global(.short)) {
          flex-direction: row;
          align-items: start;
       }
