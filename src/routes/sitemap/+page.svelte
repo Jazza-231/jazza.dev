@@ -36,11 +36,6 @@
          .icon {
             display: flex;
             align-items: center;
-
-            :global(svg) {
-               width: 1em;
-               height: 1em;
-            }
          }
       }
    }
