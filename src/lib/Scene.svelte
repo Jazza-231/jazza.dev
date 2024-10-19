@@ -7,6 +7,7 @@
    import { Text3DGeometry, Align, OrbitControls } from "@threlte/extras";
    import * as detectGPU from "detect-gpu";
    import { Object3D } from "three";
+   import Color from "color";
 
    // Setup DRACOLoader
    const gltfLoader = new GLTFLoader();
@@ -16,6 +17,16 @@
 
    const { getGPUTier } = detectGPU;
    let model = $state(0);
+   let colour = $state([1, 0, 0]);
+   let hue = 0;
+   let normalizedColour = $state([1, 0, 0]);
+
+   useTask((delta) => {
+      hue = (hue + delta * 30) % 360;
+      colour = Color({ h: hue, s: 100, l: 50 }).rgb().array();
+
+      normalizedColour = colour.map((value) => value / 255);
+   });
 
    (async () => {
       const gpuTier = await getGPUTier();
@@ -30,10 +41,7 @@
 
    // svelte-ignore non_reactive_update
    let rotate = false;
-   let rotation = $state(Math.PI / 2);
-   useTask((delta) => {
-      if (rotate) rotation += delta / 2;
-   });
+   let rotation = Math.PI / 2;
 
    const laptopEl = document.querySelector(".laptop");
    const loadingEl = document.querySelector(".loading");
@@ -72,14 +80,16 @@
    ];
 </script>
 
-<T.PerspectiveCamera
-   makeDefault
-   position={[10, 10, 0]}
-   oncreate={(ref) => {
-      ref.lookAt(0, 1, 0);
-   }}
-   zoom={3}
-></T.PerspectiveCamera>
+<T.PerspectiveCamera makeDefault position={[10, 10, 0]} zoom={3}>
+   <OrbitControls
+      autoRotate
+      enableDamping
+      autoRotateSpeed={1.5}
+      enablePan={false}
+      enableZoom={false}
+      target.y={1}
+   />
+</T.PerspectiveCamera>
 
 <T.DirectionalLight
    position={[-5, 20, 3]}
@@ -88,27 +98,34 @@
    shadow.bias={-0.0001}
 />
 
-<T.AmbientLight intensity={1} />
-
 {#await gltfLoader.loadAsync(models[model]) then gltf}
    {laptopEl?.classList.add("done")}
    {loadingEl?.classList.add("done")}
    {(rotate = true)}
-   {#key gltf.scene}
-      {gltf.scene.traverse((object: Object3D) => {
-         //@ts-ignore
-         if (object.isMesh) {
-            object.castShadow = true;
-            object.receiveShadow = true;
+   {gltf.scene.traverse((object: Object3D) => {
+      // @ts-ignore
+      if (object.isMesh) {
+         object.castShadow = true;
+         object.receiveShadow = true;
+
+         console.log(object);
+
+         if (object.name === "Object005") {
+            object.material.emissive.set(...normalizedColour);
+            object.material.color.set(...normalizedColour);
          }
-      })}
-      <T
-         is={gltf.scene}
-         position.y={modelsData[model].position}
-         rotation.y={rotation}
-         scale={modelsData[model].scale}
-      />
-   {/key}
+
+         if (object.name === "Key_") {
+            object.material.emissive.set(...normalizedColour);
+         }
+      }
+   })}
+   <T
+      is={gltf.scene}
+      position.y={modelsData[model].position}
+      rotation.y={rotation}
+      scale={modelsData[model].scale}
+   />
 {/await}
 
 <T.Mesh rotation.x={-Math.PI / 2} receiveShadow position.y={0.5}>
