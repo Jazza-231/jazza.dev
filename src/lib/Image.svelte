@@ -17,21 +17,26 @@
    }
 </script>
 
-<img
-   src={lowResPath + imageName}
-   alt="Image for {header}"
-   class="blur"
-   bind:this={image}
-/>
-<img
-   src={imagePath + imageName}
-   alt="Image for {header}"
-   class="hidden"
-   onload={loaded}
-   bind:this={srcLoader}
-/>
+<figure>
+   <img
+      src={lowResPath + imageName}
+      alt="Image for {header}"
+      class="blur"
+      bind:this={image}
+   />
+   <img
+      src={imagePath + imageName}
+      alt="Image for {header}"
+      class="hidden"
+      onload={loaded}
+      bind:this={srcLoader}
+   />
+</figure>
 
 <style>
+   figure {
+      margin: 0;
+   }
    img {
       opacity: 1;
       transition: blur 500ms;

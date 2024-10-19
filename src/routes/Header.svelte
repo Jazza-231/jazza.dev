@@ -56,7 +56,8 @@
          transform: scale(1);
          display: inline-block;
 
-         &:hover {
+         &:hover,
+         &:focus {
             color: var(--text-800);
             transform: scale(1.1);
          }

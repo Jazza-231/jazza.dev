@@ -43,7 +43,25 @@
       gap: 1rem;
       border: var(--secondary-400) solid 0.2rem;
       box-shadow: var(--secondary-200) 0 0 7rem;
+      transition:
+         box-shadow 400ms,
+         border 400ms;
       text-decoration: none;
+
+      &:hover,
+      &:focus {
+         border: var(--primary) solid 0.2rem;
+         box-shadow: var(--primary-200) 0 0 7rem;
+
+         .header {
+            color: var(--text-800);
+            text-decoration-color: var(--primary);
+         }
+
+         :global(img) {
+            transform: scale(1.05);
+         }
+      }
 
       .text {
          display: flex;
@@ -57,15 +75,10 @@
          color: var(--primary);
          transition:
             color 200ms,
-            transform 200ms;
+            text-decoration-color 200ms;
          width: fit-content;
-         transform-origin: left;
-         text-decoration: underline;
-
-         &:hover {
-            color: var(--text-800);
-            transform: scale(1.1);
-         }
+         text-decoration: underline 0.2rem transparent;
+         text-underline-offset: 0.2rem;
       }
 
       .text :not(:first-child) {
@@ -88,10 +101,6 @@
          border-radius: 0.5rem;
          box-shadow: 0 0 0.5rem var(--primary);
          transition: all 0.2s ease-in-out;
-
-         &:hover {
-            transform: scale(1.05);
-         }
       }
 
       &:global(.short img) {

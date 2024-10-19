@@ -91,7 +91,8 @@ button,
    transition: all 0.2s ease-in-out;
    font-size: larger;
 
-   &:hover {
+   &:hover,
+   &:focus {
       background: var(--primary-400);
    }
 

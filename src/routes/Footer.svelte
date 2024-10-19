@@ -146,7 +146,8 @@
                   transition: color 200ms;
                   text-decoration: none;
 
-                  &:hover {
+                  &:hover,
+                  &:focus {
                      color: var(--text-800);
                   }
                }
