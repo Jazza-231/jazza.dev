@@ -1,6 +1,6 @@
 <script lang="ts">
    import Bento from "$lib/Bento.svelte";
-   import { arrowMarkerSVG } from "$lib/icons";
+   import { arrowMarkerSVG } from "$lib/Icons";
    const { data } = $props();
    const { age } = data;
 

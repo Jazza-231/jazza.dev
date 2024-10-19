@@ -1,81 +1,81 @@
 <script lang="ts">
    import { page } from "$app/stores";
+   import { toTitleCase } from "$lib";
+
+   import {
+      CloudflareDev,
+      GithubDev,
+      SvelteDev,
+      VscodeDev,
+      TypescriptDev,
+      EslintDev,
+      ViteDev,
+      ThreeDev,
+      DeviconDev,
+      BlenderDev,
+   } from "$lib/Icons";
+   const Icons = {
+      CloudflareDev,
+      GithubDev,
+      SvelteDev,
+      VscodeDev,
+      TypescriptDev,
+      EslintDev,
+      ViteDev,
+      ThreeDev,
+      DeviconDev,
+      BlenderDev,
+   };
 
    const icons = [
       {
          name: "svelte",
          link: "https://svelte.dev/",
-         icon: "devicon-svelte-plain",
       },
       {
          name: "cloudflare",
          link: "https://www.cloudflare.com/",
-         icon: "devicon-cloudflare-plain",
       },
       {
          name: "github",
          link: "https://github.com/",
-         icon: "devicon-github-original",
       },
       {
          name: "vscode",
          link: "https://code.visualstudio.com/",
-         icon: "devicon-vscode-plain",
       },
       {
          name: "typescript",
          link: "https://www.typescriptlang.org/",
-         icon: "devicon-typescript-plain",
       },
       {
          name: "eslint",
          link: "https://eslint.org/",
-         icon: "devicon-eslint-plain",
       },
       {
          name: "vite",
          link: "https://vitejs.dev/",
-         icon: "devicon-vite-original",
       },
       {
          name: "devicon",
          link: "https://devicon.dev/",
-         icon: "devicon-devicon-plain",
       },
       {
          name: "three",
          link: "https://threejs.org/",
-         icon: "devicon-threejs-original",
       },
       {
          name: "blender",
          link: "https://www.blender.org/",
-         icon: "devicon-blender-original",
       },
    ];
-
-   function toTitleCase(str: string) {
-      return str.replace(
-         /\w\S*/g,
-         (text) =>
-            text.charAt(0).toUpperCase() + text.substring(1).toLowerCase(),
-      );
-   }
 
    function makeLabel(name: string) {
       const upperName = toTitleCase(name);
 
-      return `${upperName} Icon linking to the ${upperName} website`;
+      return `${upperName} Icon`;
    }
 </script>
-
-<svelte:head>
-   <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
-   />
-</svelte:head>
 
 <footer>
    <div class="footer-container">
@@ -95,7 +95,11 @@
                   target="_blank"
                   aria-label={makeLabel(icon.name)}
                >
-                  <i class={icon.icon}></i>
+                  <svelte:component
+                     this={Icons[
+                        `${toTitleCase(icon.name)}Dev` as keyof typeof Icons
+                     ]}
+                  />
                </a>
             </div>
          {/each}
@@ -142,13 +146,17 @@
 
                a,
                & {
-                  color: var(--text);
-                  transition: color 200ms;
+                  fill: var(--text);
+                  stroke: var(--text);
+                  transition:
+                     fill 200ms,
+                     stroke 200ms;
                   text-decoration: none;
 
                   &:hover,
                   &:focus {
-                     color: var(--text-800);
+                     fill: var(--text-800);
+                     stroke: var(--text-800);
                   }
                }
             }
