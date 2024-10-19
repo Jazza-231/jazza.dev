@@ -102,13 +102,11 @@
    {laptopEl?.classList.add("done")}
    {loadingEl?.classList.add("done")}
    {(rotate = true)}
-   {gltf.scene.traverse((object: Object3D) => {
+   {gltf.scene.traverse((object: Object3D & { material: any }) => {
       // @ts-ignore
       if (object.isMesh) {
          object.castShadow = true;
          object.receiveShadow = true;
-
-         console.log(object);
 
          if (object.name === "Object005") {
             object.material.emissive.set(...normalizedColour);
