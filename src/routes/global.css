@@ -80,7 +80,8 @@ a {
    color: var(--primary);
 }
 
-button {
+button,
+.button {
    background: var(--primary-300);
    color: var(--text);
    border: none;

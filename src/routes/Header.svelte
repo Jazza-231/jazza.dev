@@ -11,7 +11,7 @@
    </li>
 {/snippet}
 
-<nav class="header">
+<header>
    <ul>
       {@render link("/", "Home")}
       {@render link("/projects", "Projects")}
@@ -21,10 +21,10 @@
          {@render link("/secret/onlyfans", "Only Fans")}
       {/if}
    </ul>
-</nav>
+</header>
 
 <style>
-   nav {
+   header {
       position: sticky;
       top: 0;
       -webkit-backdrop-filter: blur(1rem);
@@ -46,7 +46,6 @@
       margin: 0;
 
       a {
-         color: var(--primary);
          text-decoration: none;
          padding: 1rem;
          margin: 0.3rem;

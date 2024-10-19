@@ -1,9 +1,8 @@
 <script lang="ts">
    import Bento from "$lib/Bento.svelte";
+   import { arrowMarkerSVG } from "$lib/icons";
    const { data } = $props();
    const { age } = data;
-
-   import { Arrow } from "$lib/Icons";
 
    const imagePath = "/images/bento/";
    const lowResPath = "/low-res/bento/";
@@ -94,53 +93,50 @@
       </div>
    </div>
 
-   {#snippet indented(texts: string[])}
-      {#each texts as text}
-         <li class="indented">
-            <div class="icon"><Arrow /></div>
-            {text}
-         </li>
-      {/each}
-      <br />
+   {#snippet indented(header: string, texts: string[])}
+      <h3>{header}</h3>
+      <ul>
+         {#each texts as text}
+            <li class="indented">
+               {text}
+            </li>
+         {/each}
+      </ul>
    {/snippet}
 
    <div class="about">
-      <div class="more">
-         <h2>More about me!</h2>
-         <ul class="list">
-            <li>I love programming, despite not being very good at it.</li>
-            {@render indented([
+      <h2>More about me!</h2>
+      <div class="lists" style={`--arrow-url: url("${arrowMarkerSVG}")`}>
+         {@render indented(
+            "I love programming, despite not being very good at it",
+            [
                "I am currently learning svelte (and by extension sveltekit)",
                "I started learning programming at about 17 to contribute to the Scratch Addons project",
-            ])}
-            <li>I LIVE for music.</li>
-            {@render indented([
-               "I go to TAFE (It's like college) for music sound production",
-               "Instead of performing, we do the technical side, which in my opinion is a lot more fun",
-               "I also of course love listening to music (I am right now)",
-               "Some of my favourite artists include Eminem, AJR, Imagine Dragons, and Train",
-            ])}
-            <li>I also love to play games.</li>
-            {@render indented([
-               "I play a lot of games, but I also do not play a lot of games",
-               "I have about $300 worth of games installed that I haven't played :(",
-               "And probably that much on my wishlist too",
-            ])}
-            <li>F O O D</li>
-            {@render indented([
-               "I LOVE food. Almost everything to be honest, you'll find me munching on a carrot randomly",
-               "My absolute favourite food is Spaghetti Bolognese, with a special spice mix of my own creation",
-               "My favourite pasta to go with it is Barilla Linguinie N.13",
-               "Also recently I've found a love for salmon, and I've gotten quite good at cooking it",
-            ])}
-            <li>Other things I like!</li>
-            {@render indented([
-               "Photography",
-               "Friends",
-               "Movies (Classics like Inception to new hits like Deadpool And Wolverine)",
-               "Reading (I LOVE YOU BRANDON SANDERSON)",
-            ])}
-         </ul>
+            ],
+         )}
+         {@render indented("I LIVE for music.", [
+            "I go to TAFE (It's like college) for music sound production",
+            "Instead of performing, we do the technical side, which in my opinion is a lot more fun",
+            "I also of course love listening to music (I am right now)",
+            "Some of my favourite artists include Eminem, AJR, Imagine Dragons, and Train",
+         ])}
+         {@render indented("I also love to play games.", [
+            "I play a lot of games, but I also do not play a lot of games",
+            "I have about $300 worth of games installed that I haven't played :(",
+            "And probably that much on my wishlist too",
+         ])}
+         {@render indented("F O O D", [
+            "I LOVE food. Almost everything to be honest, you'll find me munching on a carrot randomly",
+            "My absolute favourite food is Spaghetti Bolognese, with a special spice mix of my own creation",
+            "My favourite pasta to go with it is Barilla Linguine N.13",
+            "Also recently I've found a love for salmon, and I've gotten quite good at cooking it",
+         ])}
+         {@render indented("Other things I like!", [
+            "Photography",
+            "Friends",
+            "Movies (Classics like Inception to new hits like Deadpool And Wolverine)",
+            "Reading (I LOVE YOU BRANDON SANDERSON)",
+         ])}
       </div>
    </div>
 
@@ -175,22 +171,13 @@
       }
    }
 
-   .list {
-      list-style: none;
+   .lists :global(ul) {
       padding: 0;
       line-height: 1.7rem;
+      padding-inline-start: 1.5rem;
 
-      .indented {
-         padding-left: 1rem;
-         display: flex;
-         align-items: center;
-         opacity: 0.7;
-
-         .icon {
-            padding-right: 0.3rem;
-            display: flex;
-            align-items: center;
-         }
+      :global(::marker) {
+         content: var(--arrow-url);
       }
    }
 
@@ -214,7 +201,7 @@
       filter: blur(3rem);
       position: absolute;
       left: 50%;
-      top: 11rem;
+      top: 12rem;
       transform: translate(-50%, -50%);
       z-index: -1;
       opacity: 0.9;

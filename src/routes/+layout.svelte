@@ -23,21 +23,21 @@
 
 <Header></Header>
 
-<div class="main" class:wide={$page.url.pathname.match(widerPaths)}>
+<main class:wide={$page.url.pathname.match(widerPaths)}>
    {@render children()}
-</div>
+</main>
 
 <Footer></Footer>
 
 <style>
-   .main {
+   main {
       max-width: 65rem;
       margin: auto;
       margin-top: 2rem;
       padding: 0 2rem;
-   }
 
-   .main.wide {
-      max-width: 100rem;
+      &.wide {
+         max-width: 100rem;
+      }
    }
 </style>

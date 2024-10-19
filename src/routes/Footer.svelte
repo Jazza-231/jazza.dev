@@ -77,8 +77,8 @@
    />
 </svelte:head>
 
-<nav class="footer">
-   <div class="container">
+<footer>
+   <div class="footer-container">
       <div class="copy">
          {#if $page.error}
             &copy; 2024 Made with immense pain by Jazza
@@ -106,13 +106,14 @@
          >
       </div>
    </div>
-</nav>
+</footer>
 
 <style>
-   .footer {
+   footer {
       display: flex;
       justify-content: center;
-      .container {
+
+      .footer-container {
          display: flex;
          justify-content: center;
          flex-direction: column;

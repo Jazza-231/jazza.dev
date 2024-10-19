@@ -4,13 +4,11 @@
 </script>
 
 {#snippet sitemap(text: string, icon: Component, href: string)}
-   <a {href} class="sitemap-link">
-      <button class="sitemap-button">
-         <div class="icon">
-            <svelte:component this={icon} />
-         </div>
-         {text}
-      </button>
+   <a {href} class="sitemap-link button">
+      <div class="icon">
+         <svelte:component this={icon} />
+      </div>
+      {text}
    </a>
 {/snippet}
 
@@ -30,19 +28,18 @@
       flex-wrap: wrap;
       .sitemap-link {
          text-decoration: none;
-         .sitemap-button {
+         display: flex;
+         align-items: flex-start;
+         gap: 0.2rem;
+         align-items: center;
+
+         .icon {
             display: flex;
-            align-items: flex-start;
-            gap: 0.2rem;
+            align-items: center;
 
-            .icon {
-               display: flex;
-               align-items: center;
-
-               :global(svg) {
-                  width: 1em;
-                  height: 1em;
-               }
+            :global(svg) {
+               width: 1em;
+               height: 1em;
             }
          }
       }
