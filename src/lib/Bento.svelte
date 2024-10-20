@@ -28,7 +28,7 @@
          {/if}
       </div>
       <div class="image-container">
-         <Image {header} {imagePath} {lowResPath} {imageName} />
+         <img alt={header} src={imagePath + imageName} />
       </div>
    </a>
 </div>

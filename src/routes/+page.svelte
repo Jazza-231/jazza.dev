@@ -5,7 +5,6 @@
    const { age } = data;
 
    const imagePath = "/images/bento/";
-   const lowResPath = "/low-res/bento/";
 </script>
 
 <!-- PLEASE DO REACTIVITY SOMETIME https://www.youtube.com/watch?v=x4u1yp3Msao -->
@@ -51,7 +50,6 @@
          <Bento
             header="Scratch Addons"
             {imagePath}
-            {lowResPath}
             imageName="ScratchAddons.png"
             content="A collection of addons for the kids' coding website; Scratch."
             href="/projects/scratch-addons"
@@ -60,7 +58,6 @@
          <Bento
             header="MediaScout"
             {imagePath}
-            {lowResPath}
             imageName="MediaScout.png"
             content="A movie explorer and player designed to just be...better"
             href="/projects/mediascout"
@@ -72,7 +69,6 @@
          <Bento
             header="Jazza's Website"
             {imagePath}
-            {lowResPath}
             imageName="Website.png"
             content="A website I made for myself, to showcase my projects and stuff."
             href="/projects/jazzas-website"
@@ -82,7 +78,6 @@
          <Bento
             header="Quickie"
             {imagePath}
-            {lowResPath}
             imageName="LoremPicsum.jpg"
             content="When you don't have much time, these code lessons are for you."
             href="/projects/quickie"
