@@ -159,7 +159,7 @@
    .greeting {
       display: flex;
       justify-content: center;
-      margin-top: 2rem;
+      margin-block-start: 2rem;
 
       .hi {
          font-size: 4rem;
@@ -182,8 +182,8 @@
       gap: 1rem;
       width: 100%;
       box-sizing: border-box;
-      margin-bottom: 3rem;
-      margin-top: 2rem;
+      margin-block-start: 2rem;
+      margin-block-end: 3rem;
       grid-template-areas:
          "a a b"
          "c d d";

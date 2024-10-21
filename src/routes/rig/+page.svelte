@@ -44,11 +44,10 @@
 
    .laptop {
       height: 1000px;
-      /* z-index: -1; */
       position: relative;
       opacity: 0;
       transition: opacity 1000ms;
-      margin-top: -10rem;
+      margin-block-start: -10rem;
    }
 
    :global(.laptop.done) {

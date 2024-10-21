@@ -97,7 +97,7 @@
       justify-content: center;
       align-items: center;
       gap: 2rem;
-      margin-bottom: 2rem;
+      margin-block-end: 2rem;
       width: 65rem;
 
       .grid {
