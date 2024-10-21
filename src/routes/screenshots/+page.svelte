@@ -38,19 +38,14 @@
       }
    }
 
-   let modal: HTMLDivElement;
-   let modalBack: HTMLDivElement;
-   function showImage(index: number) {
-      modal.style.backgroundImage = `url(${urls[index]})`;
-      modal.style.display = "block";
-      modalBack.style.display = "block";
+   let modalImage: HTMLImageElement;
+   let modal: HTMLDialogElement;
 
-      document.addEventListener("mousedown", function handler(e) {
-         modal.style.display = "none";
-         modalBack.style.display = "none";
-         document.removeEventListener("mousedown", handler);
-      });
-   }
+   document.addEventListener("mousedown", (e) => {
+      if (e.target === modal) {
+         modal.close();
+      }
+   });
 </script>
 
 <div class="screenshots">
@@ -60,7 +55,8 @@
          <button
             class="image-container"
             onclick={() => {
-               showImage(index);
+               modalImage.src = url;
+               modal.showModal();
             }}
          >
             <Image
@@ -73,35 +69,28 @@
    </div>
 </div>
 
-<div class="modal-back" bind:this={modalBack}>
-   <div class="modal" bind:this={modal}></div>
-</div>
+<dialog bind:this={modal}>
+   <img bind:this={modalImage} alt="Screenshot" />
+</dialog>
 
 <style>
-   .modal-back {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 100;
-      backdrop-filter: blur(0.5rem);
-      display: none;
-   }
-   .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80vw;
-      height: 100%;
-      z-index: 101;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-   }
+   dialog {
+      border: none;
+      background-color: var(--background);
+      margin: auto 2rem;
+      border-radius: 1.7rem;
 
+      &::backdrop {
+         backdrop-filter: blur(0.5rem);
+      }
+
+      img {
+         width: 100%;
+         height: auto;
+         object-fit: contain;
+         border-radius: 1rem;
+      }
+   }
    .screenshots {
       display: flex;
       flex-direction: column;
