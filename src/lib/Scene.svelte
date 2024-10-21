@@ -20,12 +20,15 @@
    let colour = $state([1, 0, 0]);
    let hue = 0;
    let normalizedColour = $state([1, 0, 0]);
+   let autoRotateSpeed = $state(1.5);
 
    useTask((delta) => {
       hue = (hue + delta * 30) % 360;
       colour = Color({ h: hue, s: 100, l: 50 }).rgb().array();
 
       normalizedColour = colour.map((value) => value / 255);
+
+      autoRotateSpeed = delta * 300;
    });
 
    (async () => {
@@ -84,7 +87,7 @@
    <OrbitControls
       autoRotate
       enableDamping
-      autoRotateSpeed={1.5}
+      {autoRotateSpeed}
       enablePan={false}
       enableZoom={false}
       target.y={1}
@@ -92,9 +95,19 @@
 </T.PerspectiveCamera>
 
 <T.DirectionalLight
-   position={[-5, 20, 3]}
+   position={[-2, 5, 2]}
    intensity={2}
    castShadow
+   shadow.bias={-0.0001}
+/>
+<T.DirectionalLight
+   position={[3, 3, -2]}
+   intensity={1.5}
+   shadow.bias={-0.0001}
+/>
+<T.DirectionalLight
+   position={[0.4, 0 - 0.5, -2]}
+   intensity={0.5}
    shadow.bias={-0.0001}
 />
 
@@ -126,7 +139,7 @@
    />
 {/await}
 
-<T.Mesh rotation.x={-Math.PI / 2} receiveShadow position.y={0.5}>
+<T.Mesh rotation.x={-Math.PI / 2} receiveShadow position.y={0.4}>
    <T.CircleGeometry args={[7, 100]} />
    <T.ShadowMaterial opacity={0.3} />
 </T.Mesh>
