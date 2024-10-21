@@ -13,7 +13,7 @@ importers:
         version: 5.1.0
       '@sveltejs/adapter-cloudflare':
         specifier: ^4.7.3
-        version: 4.7.3(@sveltejs/kit@2.7.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(wrangler@3.80.0(@cloudflare/workers-types@4.20241018.0))
+        version: 4.7.3(@sveltejs/kit@2.7.2(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(wrangler@3.80.0(@cloudflare/workers-types@4.20241018.0))
       '@threlte/core':
         specifier: 8.0.0-next.17
         version: 8.0.0-next.17(svelte@5.0.0)(three@0.168.0)
@@ -27,8 +27,8 @@ importers:
         specifier: ^4.2.3
         version: 4.2.3
       detect-gpu:
-        specifier: ^5.0.52
-        version: 5.0.52
+        specifier: ^5.0.53
+        version: 5.0.53
       gsap:
         specifier: ^3.12.5
         version: 3.12.5
@@ -43,8 +43,8 @@ importers:
         specifier: ^1.48.1
         version: 1.48.1
       '@sveltejs/kit':
-        specifier: ^2.7.1
-        version: 2.7.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))
+        specifier: ^2.7.2
+        version: 2.7.2(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))
       '@sveltejs/vite-plugin-svelte':
         specifier: 4.0.0
         version: 4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))
@@ -64,8 +64,8 @@ importers:
         specifier: ^9.1.0
         version: 9.1.0(eslint@9.13.0)
       eslint-plugin-svelte:
-        specifier: ^2.45.1
-        version: 2.45.1(eslint@9.13.0)(svelte@5.0.0)
+        specifier: ^2.46.0
+        version: 2.46.0(eslint@9.13.0)(svelte@5.0.0)
       globals:
         specifier: ^15.11.0
         version: 15.11.0
@@ -717,8 +717,8 @@ packages:
       '@sveltejs/kit': ^2.0.0
       wrangler: ^3.28.4
 
-  '@sveltejs/kit@2.7.1':
-    resolution: {integrity: sha512-TBVnkwgYQT3EafGQK6Eyh5FlLEBlRhCmqPTwcdOs+QdnyUc3eCAxRWtXlFxIWtmk6pqv11zdng8qTpThdTogew==}
+  '@sveltejs/kit@2.7.2':
+    resolution: {integrity: sha512-bFwrl+0bNr0/DHQZM0INwwSPNYqDjfsKRhUoa6rj9d8tDZzszBrJ3La6/HVFxWGONEigtG+SzHXa1BEa1BLdwA==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
@@ -1049,8 +1049,8 @@ packages:
   defu@6.1.4:
     resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
 
-  detect-gpu@5.0.52:
-    resolution: {integrity: sha512-c0nacPlL1FByfS5RotXmgGBzpyISkBxy3UZz+nwpfxjVR75ru8glQ6ndEVGSNm3kTF2+iJK3ou1c6w+dKUCS3w==}
+  detect-gpu@5.0.53:
+    resolution: {integrity: sha512-RObVib0a6wjcNvljcTynCiqTGOV1pY+RnZojsdjr2tsI5fF8Uj4CFdsT7ccw4QQIAlO0l8FTYES+Pq64AirZQA==}
 
   detect-libc@2.0.3:
     resolution: {integrity: sha512-bwy0MGW55bG41VqxxypOsdSdGqLwXPI/focwgTYCFMbdUiBAxLg9CFzG08sz2aqzknwiX7Hkl0bQENjg8iLByw==}
@@ -1091,12 +1091,12 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-svelte@2.45.1:
-    resolution: {integrity: sha512-mYAKNDRji0YWl7o00KQi0enREcrtzcN7xwK/8lwk5uLRoKLjzPXc+WjngsYpPV35I3AF7UlXc1+JfyNMJS+njA==}
+  eslint-plugin-svelte@2.46.0:
+    resolution: {integrity: sha512-1A7iEMkzmCZ9/Iz+EAfOGYL8IoIG6zeKEq1SmpxGeM5SXmoQq+ZNnCpXFVJpsxPWYx8jIVGMerQMzX20cqUl0g==}
     engines: {node: ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0-0 || ^9.0.0-0
-      svelte: ^3.37.0 || ^4.0.0 || ^5.0.0-next.191
+      svelte: ^3.37.0 || ^4.0.0 || ^5.0.0
     peerDependenciesMeta:
       svelte:
         optional: true
@@ -1332,8 +1332,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  known-css-properties@0.34.0:
-    resolution: {integrity: sha512-tBECoUqNFbyAY4RrbqsBQqDFpGXAEbdD5QKr8kACx3+rnArmuuR22nKQWKazvp07N9yjTyDZaw/20UIH8tL9DQ==}
+  known-css-properties@0.35.0:
+    resolution: {integrity: sha512-a/RAk2BfKk+WFGhhOCAYqSiFLc34k8Mt/6NWRI4joER0EYUzXIcFivjjnoD3+XU1DggLn/tZc3DOAgke7l8a4A==}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -1677,11 +1677,11 @@ packages:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
 
-  svelte-eslint-parser@0.42.0:
-    resolution: {integrity: sha512-e7LyqFPTuF43ZYhKOf0Gq1lzP+G64iWVJXAIcwVxohGx5FFyqdUkw7DEXNjZ+Fm+TAA98zPmDqWvgD1OpyMi5A==}
+  svelte-eslint-parser@0.43.0:
+    resolution: {integrity: sha512-GpU52uPKKcVnh8tKN5P4UZpJ/fUDndmq7wfsvoVXsyP+aY0anol7Yqo01fyrlaWGMFfm4av5DyrjlaXdLRJvGA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
-      svelte: ^3.37.0 || ^4.0.0 || ^5.0.0-next.191
+      svelte: ^3.37.0 || ^4.0.0 || ^5.0.0
     peerDependenciesMeta:
       svelte:
         optional: true
@@ -2359,15 +2359,15 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.24.0':
     optional: true
 
-  '@sveltejs/adapter-cloudflare@4.7.3(@sveltejs/kit@2.7.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(wrangler@3.80.0(@cloudflare/workers-types@4.20241018.0))':
+  '@sveltejs/adapter-cloudflare@4.7.3(@sveltejs/kit@2.7.2(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(wrangler@3.80.0(@cloudflare/workers-types@4.20241018.0))':
     dependencies:
       '@cloudflare/workers-types': 4.20241018.0
-      '@sveltejs/kit': 2.7.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))
+      '@sveltejs/kit': 2.7.2(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))
       esbuild: 0.21.5
       worktop: 0.8.0-next.18
       wrangler: 3.80.0(@cloudflare/workers-types@4.20241018.0)
 
-  '@sveltejs/kit@2.7.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))':
+  '@sveltejs/kit@2.7.2(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7)))(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 4.0.0(svelte@5.0.0)(vite@5.4.9(@types/node@22.7.7))
       '@types/cookie': 0.6.0
@@ -2753,7 +2753,7 @@ snapshots:
 
   defu@6.1.4: {}
 
-  detect-gpu@5.0.52:
+  detect-gpu@5.0.53:
     dependencies:
       webgl-constants: 1.1.1
 
@@ -2827,20 +2827,20 @@ snapshots:
     dependencies:
       eslint: 9.13.0
 
-  eslint-plugin-svelte@2.45.1(eslint@9.13.0)(svelte@5.0.0):
+  eslint-plugin-svelte@2.46.0(eslint@9.13.0)(svelte@5.0.0):
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@9.13.0)
       '@jridgewell/sourcemap-codec': 1.5.0
       eslint: 9.13.0
       eslint-compat-utils: 0.5.1(eslint@9.13.0)
       esutils: 2.0.3
-      known-css-properties: 0.34.0
+      known-css-properties: 0.35.0
       postcss: 8.4.47
       postcss-load-config: 3.1.4(postcss@8.4.47)
       postcss-safe-parser: 6.0.0(postcss@8.4.47)
       postcss-selector-parser: 6.1.2
       semver: 7.6.3
-      svelte-eslint-parser: 0.42.0(svelte@5.0.0)
+      svelte-eslint-parser: 0.43.0(svelte@5.0.0)
     optionalDependencies:
       svelte: 5.0.0
     transitivePeerDependencies:
@@ -3073,7 +3073,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  known-css-properties@0.34.0: {}
+  known-css-properties@0.35.0: {}
 
   levn@0.4.1:
     dependencies:
@@ -3405,7 +3405,7 @@ snapshots:
     transitivePeerDependencies:
       - picomatch
 
-  svelte-eslint-parser@0.42.0(svelte@5.0.0):
+  svelte-eslint-parser@0.43.0(svelte@5.0.0):
     dependencies:
       eslint-scope: 7.2.2
       eslint-visitor-keys: 3.4.3
