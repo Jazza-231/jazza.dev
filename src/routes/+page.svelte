@@ -89,7 +89,7 @@
    </div>
 
    {#snippet indented(header: string, texts: string[])}
-      <h3>{header}</h3>
+      <h3 class:spaced={header === "FOOD"}>{header}</h3>
       <ul>
          {#each texts as text}
             <li class="indented">
@@ -120,7 +120,7 @@
             "I have about $300 worth of games installed that I haven't played :(",
             "And probably that much on my wishlist too",
          ])}
-         {@render indented("F O O D", [
+         {@render indented("FOOD", [
             "I LOVE food. Almost everything to be honest, you'll find me munching on a carrot randomly",
             "My absolute favourite food is Spaghetti Bolognese, with a special spice mix of my own creation",
             "My favourite pasta to go with it is Barilla Linguine N.13",
@@ -200,5 +200,9 @@
       transform: translate(-50%, -50%);
       z-index: -1;
       opacity: 0.9;
+   }
+
+   .spaced {
+      letter-spacing: 0.75ch;
    }
 </style>
