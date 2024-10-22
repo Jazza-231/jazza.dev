@@ -105,7 +105,7 @@
          {/each}
       </div>
       <div class="contact">
-         Contact me at <a href="mailto:admin@jazza.dev" class="secondary"
+         Contact me at <a class="global-hover" href="mailto:admin@jazza.dev"
             >admin@jazza.dev</a
          >
       </div>

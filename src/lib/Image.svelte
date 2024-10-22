@@ -20,13 +20,13 @@
 <figure>
    <img
       src={lowResPath + imageName}
-      alt="Image for {header}"
+      alt={header}
       class="blur"
       bind:this={image}
    />
    <img
       src={imagePath + imageName}
-      alt="Image for {header}"
+      alt="{header} loader"
       class="hidden"
       onload={loaded}
       bind:this={srcLoader}

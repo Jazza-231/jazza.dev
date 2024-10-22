@@ -62,7 +62,7 @@
             <Image
                imagePath={url}
                lowResPath={lowResUrls[index]}
-               header="screenshots"
+               header="Game screenshot {index + 1}"
             />
          </button>
       {/each}

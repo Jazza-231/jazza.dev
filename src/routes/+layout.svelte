@@ -35,6 +35,7 @@
       margin: auto;
       margin-top: 2rem;
       padding: 0 2rem;
+      z-index: 1;
 
       &.wide {
          max-width: 100rem;

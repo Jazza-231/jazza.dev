@@ -17,7 +17,7 @@
 </script>
 
 <div class={`bento bento-${bentoClass}`} style={`grid-area: ${area};`}>
-   <a {href} aria-label="Link to {header} project page." class:short>
+   <a {href} aria-label="{header} project page" class:short>
       <div class="text">
          <h3 class="header">{header}</h3>
          <p>{content}</p>

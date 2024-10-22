@@ -68,16 +68,22 @@ p {
    line-height: 1.5rem;
 }
 
-.primary {
-   color: var(--primary);
-}
-
-.secondary {
-   color: var(--secondary);
-}
-
 a {
    color: var(--primary);
+
+   &.global-hover {
+      border-radius: 0.2rem;
+      text-underline-offset: 0.1rem;
+      padding: 0.2rem;
+      margin: -0.2rem;
+      transition: all 200ms;
+
+      &:hover {
+         color: var(--text);
+         background-color: var(--primary-300);
+         text-underline-offset: 0.5rem;
+      }
+   }
 }
 
 button,
