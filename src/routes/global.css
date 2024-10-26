@@ -4,6 +4,10 @@
    --pattern: url("../topography.svg");
 }
 
+html {
+   overflow-y: scroll;
+}
+
 body {
    background: linear-gradient(var(--background), var(--background-100)),
       var(--pattern);
