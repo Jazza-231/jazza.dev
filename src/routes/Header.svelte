@@ -62,6 +62,10 @@
             transform: scale(1.1);
          }
 
+         &:active {
+            color: var(--secondary-800);
+         }
+
          &.selected {
             color: var(--text);
             transform: scale(1.3);

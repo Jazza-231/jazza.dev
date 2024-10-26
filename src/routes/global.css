@@ -57,6 +57,12 @@ body {
    color: transparent;
 }
 
+::selection {
+   background: var(--secondary);
+   color: var(--text);
+   text-shadow: 1px 1px 1px black;
+}
+
 h1 {
    color: var(--secondary);
 }
@@ -77,15 +83,22 @@ a {
    color: var(--primary);
 
    &.global-hover {
-      border-radius: 0.2rem;
       text-underline-offset: 0.1rem;
-      padding: 0.2rem;
-      margin: -0.2rem;
+      padding: 0.1rem;
+      margin: -0.1rem;
       transition: all 200ms;
 
-      &:hover {
+      &:hover,
+      &:focus {
          color: var(--text);
          background-color: var(--primary-300);
+         text-underline-offset: 0.5rem;
+         text-shadow: 1px 1px 1px black;
+      }
+
+      &:active {
+         color: var(--text);
+         background-color: var(--secondary-300);
          text-underline-offset: 0.5rem;
       }
    }
