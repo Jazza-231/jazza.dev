@@ -11,10 +11,10 @@
 
 <div class="home">
    <div class="greeting">
-      <div class="glow"></div>
       <div class="hi">
          Hi! I'm <span class="colour-effect">Jazza</span>
       </div>
+      <div class="glow"></div>
    </div>
 
    <div class="who">
@@ -194,17 +194,41 @@
          "c d d";
    }
 
+   @property --c1 {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: black;
+   }
+
+   @property --c2 {
+      syntax: "<color>";
+      inherits: false;
+      initial-value: black;
+   }
+
    .glow {
-      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      --c1: var(--primary);
+      --c2: var(--secondary);
+      background: linear-gradient(45deg, var(--c1), var(--c2));
       width: 23rem;
       height: 3rem;
       filter: blur(3rem);
       position: absolute;
       left: 50%;
       top: 12rem;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(1);
       z-index: -1;
       opacity: 0.9;
+      transition:
+         --c1 200ms,
+         --c2 200ms,
+         transform 200ms;
+   }
+
+   .hi:hover + .glow {
+      --c1: var(--primary);
+      --c2: var(--accent-400);
+      transform: translate(-50%, -50%) scale(1.1);
    }
 
    .spaced {
