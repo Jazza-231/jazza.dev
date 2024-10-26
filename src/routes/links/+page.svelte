@@ -42,11 +42,13 @@
 <div class="links">
    {#each Object.entries(links) as [text, href], index}
       <a
+         class="external-link float"
          {href}
          target="_blank"
          style="position: relative; top: {data[index]?.y || 100}px; left: {data[
             index
-         ]?.x || 200}px; --scale: {data[index]?.scale};"
+         ]?.x || 200}px; --scale: {data[index]?.scale}; --delay: {-index *
+            0.4}s"
          ondrag={(e: MouseEvent) => {
             if (!dev) return;
             if (!data[index]) {
@@ -79,10 +81,27 @@
          font-size: 1.25rem;
          transform: scale(var(--scale, 1));
          transition: transform 200ms;
+         height: fit-content;
 
          &:hover {
             transform: scale(calc(var(--scale, 1) + 0.2));
          }
       }
+   }
+
+   @keyframes float {
+      0% {
+         translate: 0px 0px;
+      }
+      50% {
+         translate: 0px -20px;
+      }
+      100% {
+         translate: 0px 0px;
+      }
+   }
+
+   .float {
+      animation: float 4s ease-in-out var(--delay, 0s) infinite;
    }
 </style>

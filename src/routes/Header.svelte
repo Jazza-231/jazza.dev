@@ -7,7 +7,7 @@
    {@const selected = path === href.split("/")[1]}
 
    <li>
-      <a {href} class:selected>{text}</a>
+      <a {href} class="header-link" class:selected>{text}</a>
    </li>
 {/snippet}
 
@@ -55,16 +55,6 @@
          font-size: 1.5rem;
          transform: scale(1);
          display: inline-block;
-
-         &:hover,
-         &:focus {
-            color: var(--text-800);
-            transform: scale(1.1);
-         }
-
-         &:active {
-            color: var(--secondary-800);
-         }
 
          &.selected {
             color: var(--text);
