@@ -65,3 +65,74 @@
    --accent-900: oklch(89.35% 0.06 0.14);
    --accent-950: oklch(94.49% 0.03 359.5);
 }
+
+/* Trick my CSS extension into thinking that these are the CSS variables that are being used
+because they are lower in the file so that I can get the preview colours to work, but in
+reality these CSS variables will never be used. */
+:root[about-me="I love alcohol"] {
+   --text: #e7e1fb;
+   --background: #04020c;
+   --primary: #9881ed;
+   --secondary: #871368;
+   --accent: #ff0043;
+
+   --text-50: #080316;
+   --text-100: #0f062d;
+   --text-200: #1e0c5a;
+   --text-300: #2d1287;
+   --text-400: #3d18b4;
+   --text-500: #4c1fe0;
+   --text-600: #704be7;
+   --text-700: #9378ed;
+   --text-800: #b7a5f3;
+   --text-900: #dbd2f9;
+   --text-950: #ede9fc;
+
+   --background-50: #070416;
+   --background-100: #0f072c;
+   --background-200: #1d0f57;
+   --background-300: #2c1683;
+   --background-400: #3b1eae;
+   --background-500: #4925da;
+   --background-600: #6e51e1;
+   --background-700: #927ce9;
+   --background-800: #b6a8f0;
+   --background-900: #dbd3f8;
+   --background-950: #ede9fb;
+
+   --primary-50: #070316;
+   --primary-100: #0f062d;
+   --primary-200: #1d0d59;
+   --primary-300: #2c1386;
+   --primary-400: #3b19b3;
+   --primary-500: #4920df;
+   --primary-600: #6e4ce6;
+   --primary-700: #9279ec;
+   --primary-800: #b6a6f2;
+   --primary-900: #dbd2f9;
+   --primary-950: #ede9fc;
+
+   --secondary-50: #160311;
+   --secondary-100: #2d0622;
+   --secondary-200: #590d45;
+   --secondary-300: #861367;
+   --secondary-400: #b3198a;
+   --secondary-500: #df20ac;
+   --secondary-600: #e64cbd;
+   --secondary-700: #ec79cd;
+   --secondary-800: #f2a6de;
+   --secondary-900: #f9d2ee;
+   --secondary-950: #fce9f7;
+
+   --accent-50: #1a0007;
+   --accent-100: #33000e;
+   --accent-200: #66001b;
+   --accent-300: #990029;
+   --accent-400: #cc0036;
+   --accent-500: #ff0044;
+   --accent-600: #ff3369;
+   --accent-700: #ff668f;
+   --accent-800: #ff99b4;
+   --accent-900: #ffccda;
+   --accent-950: #ffe5ec;
+}
