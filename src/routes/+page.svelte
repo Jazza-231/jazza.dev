@@ -38,12 +38,12 @@
          svelte+kit. When I am not studying or coding, I am probably gaming. I
          play relatively popular games, such as Red Dead Redemption 2, CS2,
          Forza Horizon 5, and Cyberpunk 2077. You can check out screenshots <a
-            class="global-hover"
+            class="internal-link"
             href="/screenshots"
             aria-label="Game screenshots">here</a
          >
          and my rig
-         <a class="global-hover" href="/rig" aria-label="3D model of my rig"
+         <a class="internal-link" href="/rig" aria-label="3D model of my rig"
             >here.</a
          >
       </p>
@@ -141,7 +141,7 @@
    </div>
 
    <div class="sitemap">
-      <a class="global-hover" href="/sitemap"> Sitemap </a>
+      <a class="internal-link" href="/sitemap"> Sitemap </a>
    </div>
 </div>
 

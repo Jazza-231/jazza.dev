@@ -82,7 +82,7 @@ p {
 a {
    color: var(--primary);
 
-   &.global-hover {
+   &.internal-link {
       text-underline-offset: 0.1rem;
       padding: 0.1rem;
       margin: -0.1rem;
@@ -100,6 +100,19 @@ a {
          color: var(--text);
          background-color: var(--secondary-300);
          text-underline-offset: 0.5rem;
+      }
+   }
+
+   &.external-link,
+   &.header-link {
+      &:hover,
+      &:focus {
+         color: var(--text-800);
+         transform: scale(1.1);
+      }
+
+      &:active {
+         color: var(--secondary-800);
       }
    }
 }
