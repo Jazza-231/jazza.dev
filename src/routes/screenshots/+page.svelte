@@ -68,16 +68,21 @@
    dialog {
       border: none;
       background-color: var(--background);
-      margin: auto 2rem;
       border-radius: 1.7rem;
-
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      display: none;
+      &[open] {
+         display: initial;
+      }
       &::backdrop {
          backdrop-filter: blur(0.5rem);
       }
 
       img {
-         width: 100%;
-         height: auto;
+         max-width: 90vw;
+         max-height: 80vh;
          object-fit: contain;
          border-radius: 1rem;
       }
@@ -96,6 +101,7 @@
          grid-template-columns: repeat(3, 1fr);
          gap: 1rem;
          width: 100%;
+         align-items: center;
 
          .image-container {
             display: flex;
@@ -103,6 +109,7 @@
             align-items: center;
             padding: 0;
             background: none;
+            height: fit-content;
 
             :global(img) {
                width: 100%;
