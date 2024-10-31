@@ -1,75 +1,51 @@
 <script lang="ts">
-   import Image from "$lib/Image.svelte";
-
    const images = import.meta.glob(
       "/src/lib/images/screenshots/cropped/*.{png,jpg}",
       {
          eager: true,
-         query: "?url",
+         query: "enhanced",
          import: "default",
       },
    );
 
-   const lowResImages = import.meta.glob(
-      "/src/lib/low-res/screenshots/cropped/*.{png,jpg}",
-      {
-         eager: true,
-         query: "?url",
-         import: "default",
-      },
-   );
-
-   let urls: string[] = [];
-   let lowResUrls: string[] = [];
-
-   for (const image in images) {
-      if (Object.prototype.hasOwnProperty.call(images, image)) {
-         const url = images[image] as string;
-
-         urls.push(url);
-      }
-   }
-
-   for (const image in lowResImages) {
-      if (Object.prototype.hasOwnProperty.call(lowResImages, image)) {
-         const url = lowResImages[image] as string;
-
-         lowResUrls.push(url);
-      }
-   }
+   const imagesArr = Object.values(images);
 
    let modalImage: HTMLImageElement;
    let modal: HTMLDialogElement;
-
-   document.addEventListener("mousedown", (e) => {
-      if (e.target === modal) {
-         modal.close();
-      }
-   });
+   let loader: HTMLImageElement;
 </script>
+
+<img bind:this={loader} hidden />
 
 <div class="screenshots">
    <h1>Screenshots</h1>
    <div class="grid">
-      {#each urls as url, index}
+      {#each imagesArr as image, index}
+         {console.log(image)}
          <button
+            aria-label="Image"
             class="image-container"
             onclick={() => {
-               modalImage.src = url;
+               modalImage.src = image.img.src;
                modal.showModal();
             }}
+            onmouseenter={() => {
+               loader.src = image.img.src;
+            }}
          >
-            <Image
-               imagePath={url}
-               lowResPath={lowResUrls[index]}
-               header="Game screenshot {index + 1}"
-            />
+            <enhanced:img src={image} alt="Game screenshot {index + 1}" />
          </button>
       {/each}
    </div>
 </div>
 
-<dialog bind:this={modal}>
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<dialog
+   bind:this={modal}
+   onmousedown={() => {
+      modal.close();
+   }}
+>
    <img bind:this={modalImage} alt="Screenshot" />
 </dialog>
 

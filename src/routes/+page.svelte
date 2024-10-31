@@ -4,7 +4,10 @@
    const { data } = $props();
    const { age } = data;
 
-   const imagePath = "/images/bento/";
+   import ScratchAddonsImage from "$lib/images/bento/ScratchAddons.png?enhanced";
+   import MediaScoutImage from "$lib/images/bento/MediaScout.png?enhanced";
+   import WebsiteImage from "$lib/images/bento/Website.png?enhanced";
+   import LoremPicsumImage from "$lib/images/bento/LoremPicsum.jpg?enhanced";
 </script>
 
 <!-- PLEASE DO REACTIVITY SOMETIME https://www.youtube.com/watch?v=x4u1yp3Msao -->
@@ -54,39 +57,35 @@
       <div class="bentos">
          <Bento
             header="Scratch Addons"
-            {imagePath}
-            imageName="ScratchAddons.png"
             content="A collection of addons for the kids' coding website; Scratch."
             href="/projects/scratch-addons"
             area="a"
+            image={ScratchAddonsImage}
          />
          <Bento
             header="MediaScout"
-            {imagePath}
-            imageName="MediaScout.png"
             content="A movie explorer and player designed to just be...better"
             href="/projects/mediascout"
             short
             area="b"
+            image={MediaScoutImage}
          >
             <p>Currently private.</p>
          </Bento>
          <Bento
             header="Jazza's Website"
-            {imagePath}
-            imageName="Website.png"
             content="A website I made for myself, to showcase my projects and stuff."
             href="/projects/jazzas-website"
             short
             area="c"
+            image={WebsiteImage}
          />
          <Bento
             header="Quickie"
-            {imagePath}
-            imageName="LoremPicsum.jpg"
             content="When you don't have much time, these code lessons are for you."
             href="/projects/quickie"
             area="d"
+            image={LoremPicsumImage}
          >
             <p>Currently private.</p>
          </Bento>
