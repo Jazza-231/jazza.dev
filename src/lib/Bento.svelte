@@ -1,5 +1,4 @@
 <script lang="ts">
-   import Image from "./Image.svelte";
    const props = $props();
    const {
       header,
