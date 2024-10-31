@@ -8,33 +8,48 @@
       },
    );
 
-   const imagesArr = Object.values(images);
+   type ImageObject = {
+      sources: {
+         avif: string;
+         webp: string;
+         jpeg: string;
+      };
+      img: {
+         src: string;
+         w: number;
+         h: number;
+      };
+   };
+
+   const imagesArr: ImageObject[] = Object.values(images) as ImageObject[];
 
    let modalImage: HTMLImageElement;
    let modal: HTMLDialogElement;
    let loader: HTMLImageElement;
 </script>
 
+<!-- svelte-ignore a11y_missing_attribute -->
 <img bind:this={loader} hidden />
 
 <div class="screenshots">
    <h1>Screenshots</h1>
    <div class="grid">
       {#each imagesArr as image, index}
-         {console.log(image)}
-         <button
-            aria-label="Image"
-            class="image-container"
-            onclick={() => {
-               modalImage.src = image.img.src;
-               modal.showModal();
-            }}
-            onmouseenter={() => {
-               loader.src = image.img.src;
-            }}
-         >
-            <enhanced:img src={image} alt="Game screenshot {index + 1}" />
-         </button>
+         {#if image}
+            <button
+               aria-label="Image"
+               class="image-container"
+               onclick={() => {
+                  modalImage.src = image.img.src;
+                  modal.showModal();
+               }}
+               onmouseenter={() => {
+                  loader.src = image.img.src;
+               }}
+            >
+               <enhanced:img src={image} alt="Game screenshot {index + 1}" />
+            </button>
+         {/if}
       {/each}
    </div>
 </div>
