@@ -55,6 +55,12 @@
          font-size: 1.5rem;
          transform: scale(1);
          display: inline-block;
+         outline: transparent 2px solid;
+         border-radius: 0.5rem;
+
+         &:focus {
+            outline-color: var(--secondary);
+         }
 
          &.selected {
             color: var(--text);
