@@ -58,7 +58,7 @@
          outline: transparent 2px solid;
          border-radius: 0.5rem;
 
-         &:focus {
+         &:focus-visible {
             outline-color: var(--secondary);
          }
 

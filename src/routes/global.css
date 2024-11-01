@@ -90,7 +90,7 @@ a {
 
       outline: none;
 
-      &:focus {
+      &:focus-visible {
          outline: none;
       }
 
