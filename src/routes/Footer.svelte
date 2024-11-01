@@ -153,10 +153,18 @@
                      stroke 200ms;
                   text-decoration: none;
 
+                  outline: none;
+
                   &:hover,
                   &:focus {
                      fill: var(--text-800);
                      stroke: var(--text-800);
+                  }
+
+                  &:focus {
+                     outline: none;
+                     fill: var(--primary);
+                     stroke: var(--primary);
                   }
                }
             }

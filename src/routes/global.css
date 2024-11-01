@@ -88,6 +88,12 @@ a {
       margin: -0.1rem;
       transition: all 200ms;
 
+      outline: none;
+
+      &:focus {
+         outline: none;
+      }
+
       &:hover,
       &:focus {
          color: var(--text);

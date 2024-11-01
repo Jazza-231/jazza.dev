@@ -37,6 +37,11 @@
          box-shadow 400ms,
          border 400ms;
       text-decoration: none;
+      outline: none;
+
+      &:focus {
+         outline: none;
+      }
 
       &:hover,
       &:focus {
