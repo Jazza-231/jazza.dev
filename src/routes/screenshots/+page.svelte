@@ -1,4 +1,6 @@
 <script lang="ts">
+   import { browser } from "$app/environment";
+
    const images = import.meta.glob(
       "/src/lib/images/screenshots/cropped/*.{png,jpg}",
       {
@@ -26,7 +28,76 @@
    let modalImage: HTMLImageElement;
    let modal: HTMLDialogElement;
    let loader: HTMLImageElement;
+   let selectedImage = $state(0);
+   let buttons: HTMLButtonElement[] = $state([]);
+
+   if (browser) {
+      document.addEventListener("keydown", (e) => {
+         if (e.key.includes("Arrow")) e.preventDefault();
+
+         if (modal && modal.open) {
+            if (e.key === "ArrowLeft") {
+               selectedImage--;
+               if (selectedImage < 0) {
+                  selectedImage = imagesArr.length - 1;
+               }
+               loader.src = imagesArr[selectedImage - 1]?.img.src;
+            } else if (e.key === "ArrowRight") {
+               selectedImage++;
+               if (selectedImage >= imagesArr.length) {
+                  selectedImage = 0;
+               }
+               loader.src = imagesArr[selectedImage + 1]?.img.src;
+            }
+         } else {
+            switch (e.key) {
+               case "ArrowLeft":
+                  selectedImage--;
+                  if (selectedImage < 0) {
+                     selectedImage = imagesArr.length - 1;
+                  }
+                  buttons[selectedImage]?.focus();
+                  break;
+               case "ArrowRight":
+                  selectedImage++;
+                  if (selectedImage >= imagesArr.length) {
+                     selectedImage = 0;
+                  }
+                  buttons[selectedImage]?.focus();
+                  break;
+               case "ArrowUp":
+                  selectedImage -= 3;
+                  if (selectedImage < 0) {
+                     selectedImage = imagesArr.length - 1;
+                  }
+                  buttons[selectedImage]?.focus();
+                  break;
+               case "ArrowDown":
+                  selectedImage += 3;
+                  if (selectedImage >= imagesArr.length) {
+                     selectedImage = 0;
+                  }
+                  buttons[selectedImage]?.focus();
+                  break;
+            }
+         }
+      });
+   }
+
+   $effect(() => {
+      modal.onclose = () => {
+         buttons[selectedImage].focus();
+      };
+   });
 </script>
+
+<svelte:head>
+   {#each imagesArr as image, index}
+      {#if image && index < 10}
+         <link rel="prerender" href={image.img.src} />
+      {/if}
+   {/each}
+</svelte:head>
 
 <!-- svelte-ignore a11y_missing_attribute -->
 <img bind:this={loader} hidden />
@@ -35,21 +106,25 @@
    <h1>Screenshots</h1>
    <div class="grid">
       {#each imagesArr as image, index}
-         {#if image}
-            <button
-               aria-label="Image"
-               class="image-container"
-               onclick={() => {
-                  modalImage.src = image.img.src;
-                  modal.showModal();
-               }}
-               onmouseenter={() => {
-                  loader.src = image.img.src;
-               }}
-            >
-               <enhanced:img src={image} alt="Game screenshot {index + 1}" />
-            </button>
-         {/if}
+         <button
+            bind:this={buttons[index]}
+            aria-label="Image"
+            class="image-container"
+            onclick={() => {
+               selectedImage = index;
+               modal.showModal();
+               loader.src = imagesArr[index + 1]?.img.src;
+            }}
+            onmouseenter={() => {
+               loader.src = image.img.src;
+            }}
+            onfocus={() => {
+               loader.src = image.img.src;
+               selectedImage = index;
+            }}
+         >
+            <enhanced:img src={image} alt="Game screenshot {index + 1}" />
+         </button>
       {/each}
    </div>
 </div>
@@ -61,7 +136,11 @@
       modal.close();
    }}
 >
-   <img bind:this={modalImage} alt="Screenshot" />
+   <img
+      bind:this={modalImage}
+      alt="Screenshot"
+      src={imagesArr[selectedImage]?.img.src}
+   />
 </dialog>
 
 <style>
@@ -73,6 +152,7 @@
       align-items: center;
       justify-content: center;
       display: none;
+      outline: none;
       &[open] {
          display: initial;
       }
@@ -110,6 +190,11 @@
             padding: 0;
             background: none;
             height: fit-content;
+            outline: transparent 2px solid;
+
+            &:focus {
+               outline-color: var(--secondary);
+            }
 
             :global(img) {
                width: 100%;
