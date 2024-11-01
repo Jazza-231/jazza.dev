@@ -161,6 +161,7 @@
          max-width: 90vw;
          max-height: 80vh;
          height: auto;
+         width: auto;
          object-fit: contain;
          border-radius: 1rem;
       }
