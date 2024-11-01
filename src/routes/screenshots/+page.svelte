@@ -30,53 +30,42 @@
    let loader: HTMLImageElement;
    let selectedImage = $state(0);
    let buttons: HTMLButtonElement[] = $state([]);
+   let closingModal = false;
 
    if (browser) {
       document.addEventListener("keydown", (e) => {
          if (e.key.includes("Arrow")) e.preventDefault();
 
+         // The old method worked by seeing an error (aka selectedImage was out of bounds)
+         // and then fixing it, this method means that the selected image will always be in bounds
+         // stopping the reactive usages of selectedImage from updating and causing an error
          if (modal && modal.open) {
             if (e.key === "ArrowLeft") {
-               selectedImage--;
-               if (selectedImage < 0) {
-                  selectedImage = imagesArr.length - 1;
-               }
-               loader.src = imagesArr[selectedImage - 1]?.img.src;
+               selectedImage =
+                  (selectedImage - 1 + imagesArr.length) % imagesArr.length;
+               loader.src = imagesArr[selectedImage - 1].img.src;
             } else if (e.key === "ArrowRight") {
-               selectedImage++;
-               if (selectedImage >= imagesArr.length) {
-                  selectedImage = 0;
-               }
-               loader.src = imagesArr[selectedImage + 1]?.img.src;
+               selectedImage = (selectedImage + 1) % imagesArr.length;
+               loader.src = imagesArr[selectedImage + 1].img.src;
             }
          } else {
             switch (e.key) {
                case "ArrowLeft":
-                  selectedImage--;
-                  if (selectedImage < 0) {
-                     selectedImage = imagesArr.length - 1;
-                  }
+                  selectedImage =
+                     (selectedImage - 1 + imagesArr.length) % imagesArr.length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowRight":
-                  selectedImage++;
-                  if (selectedImage >= imagesArr.length) {
-                     selectedImage = 0;
-                  }
+                  selectedImage = (selectedImage + 1) % imagesArr.length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowUp":
-                  selectedImage -= 3;
-                  if (selectedImage < 0) {
-                     selectedImage = imagesArr.length - 1;
-                  }
+                  selectedImage =
+                     (selectedImage - 3 + imagesArr.length) % imagesArr.length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowDown":
-                  selectedImage += 3;
-                  if (selectedImage >= imagesArr.length) {
-                     selectedImage = 0;
-                  }
+                  selectedImage = (selectedImage + 3) % imagesArr.length;
                   buttons[selectedImage]?.focus();
                   break;
             }
@@ -84,11 +73,7 @@
       });
    }
 
-   $effect(() => {
-      modal.onclose = () => {
-         buttons[selectedImage].focus();
-      };
-   });
+   $inspect(selectedImage);
 </script>
 
 <svelte:head>
@@ -113,14 +98,19 @@
             onclick={() => {
                selectedImage = index;
                modal.showModal();
+               closingModal = true;
                loader.src = imagesArr[index + 1]?.img.src;
             }}
             onmouseenter={() => {
                loader.src = image.img.src;
             }}
             onfocus={() => {
-               loader.src = image.img.src;
-               selectedImage = index;
+               console.log(closingModal);
+
+               if (!closingModal) {
+                  loader.src = image.img.src;
+                  selectedImage = index;
+               }
             }}
          >
             <enhanced:img src={image} alt="Game screenshot {index + 1}" />
@@ -135,11 +125,18 @@
    onmousedown={() => {
       modal.close();
    }}
+   onclose={() => {
+      buttons[selectedImage]?.focus();
+      closingModal = false;
+      console.log("closing");
+   }}
 >
    <img
       bind:this={modalImage}
       alt="Screenshot"
       src={imagesArr[selectedImage]?.img.src}
+      width={imagesArr[selectedImage]?.img.w}
+      height={imagesArr[selectedImage]?.img.h}
    />
 </dialog>
 
@@ -163,6 +160,7 @@
       img {
          max-width: 90vw;
          max-height: 80vh;
+         height: auto;
          object-fit: contain;
          border-radius: 1rem;
       }
@@ -192,7 +190,7 @@
             height: fit-content;
             outline: transparent 2px solid;
 
-            &:focus {
+            &:focus-visible {
                outline-color: var(--secondary);
             }
 
