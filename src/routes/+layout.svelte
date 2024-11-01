@@ -14,7 +14,7 @@
       [name, $page.url.pathname.split("/")[1]].filter(Boolean).join(" - "),
    );
 
-   const widerPaths = /^\/screenshots\/\d+$/;
+   const widerPaths = "/screenshots";
 </script>
 
 <svelte:head>
@@ -38,7 +38,7 @@
       z-index: 1;
 
       &.wide {
-         max-width: 100rem;
+         max-width: 90rem;
       }
    }
 </style>

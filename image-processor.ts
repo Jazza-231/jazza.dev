@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "path";
 
 const deleteAndRecreateOutputDir = async (outDir: string) => {
+   console.log(fs.existsSync(outDir));
+
    if (fs.existsSync(outDir)) {
       try {
          fs.rmSync(outDir, { recursive: true });
@@ -13,6 +15,7 @@ const deleteAndRecreateOutputDir = async (outDir: string) => {
    fs.mkdirSync(outDir, { recursive: true });
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const processImagesRecursively = (dir: string, outDir: string) => {
    const items = fs.readdirSync(dir);
 
@@ -46,7 +49,13 @@ async function cropImages(inputDir: string, outputDir: string) {
       const inputFilePath = path.join(inputDir, file);
       const outputFilePath = path.join(outputDir, file);
 
-      if (fs.statSync(inputFilePath).isFile()) {
+      if (fs.statSync(inputFilePath).isDirectory()) {
+         const newOutputDir = path.join(outputDir, file);
+         if (!fs.existsSync(newOutputDir)) {
+            fs.mkdirSync(newOutputDir, { recursive: true });
+         }
+         await cropImages(inputFilePath, newOutputDir);
+      } else {
          try {
             const image = sharp(inputFilePath);
             const { data, info } = await image
@@ -150,7 +159,7 @@ async function cropImages(inputDir: string, outputDir: string) {
 
 const imageCropper = async () => {
    const inputDir = path.resolve("src/lib/images/screenshots/");
-   const outputDir = path.resolve("src/lib/images/screenshots/cropped/");
+   const outputDir = path.resolve("src/lib/images/screenshots-cropped");
 
    await deleteAndRecreateOutputDir(outputDir);
    await cropImages(inputDir, outputDir);
@@ -158,13 +167,9 @@ const imageCropper = async () => {
 };
 
 const imageSizer = async () => {
-   const inputDir = path.resolve("src/lib/images/screenshots/cropped/");
-   const outputDir = path.resolve("src/lib/low-res/screenshots/cropped/");
-
-   await deleteAndRecreateOutputDir(outputDir);
-   await processImagesRecursively(inputDir, outputDir);
-
-   console.log("Image sizing complete.");
+   console.log(
+      "Currently unused, skipping image resizing for superior enhanced:img",
+   );
 };
 
 // Vite plugin

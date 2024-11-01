@@ -1,14 +1,19 @@
 <script lang="ts">
-   import { browser } from "$app/environment";
+   import { browser, dev } from "$app/environment";
 
-   const images = import.meta.glob(
-      "/src/lib/images/screenshots/cropped/*.{png,jpg}",
+   const imports = import.meta.glob(
+      "/src/lib/images/screenshots-cropped/**/*.{png,jpg}",
       {
          eager: true,
-         query: "enhanced",
+         query: "enhanced&w=2560;1280;640",
          import: "default",
       },
    );
+
+   import nsfwDataImport from "./nsfw.json";
+   let nsfwData = $state(nsfwDataImport) as ["blood" | "nudity" | null];
+
+   $inspect(nsfwData);
 
    type ImageObject = {
       sources: {
@@ -23,16 +28,43 @@
       };
    };
 
-   const imagesArr: ImageObject[] = Object.values(images) as ImageObject[];
+   const location = /(?<=\/screenshots-cropped\/)([^/]+)/;
+   const imagesArr: ImageObject[] = Object.values(imports) as ImageObject[];
+   const imagesLocation = Object.keys(imports).map(
+      (src) => src.match(location)?.[1] || "Unknown",
+   );
+
+   const images = imagesArr.map((image, index) => {
+      return {
+         ...image,
+         data: {
+            game: imagesLocation[index],
+            nsfw: nsfwData[index],
+         },
+      };
+   });
+
+   console.log(images);
 
    let modalImage: HTMLImageElement;
    let modal: HTMLDialogElement;
    let loader: HTMLImageElement;
-   let selectedImage = $state(0);
    let buttons: HTMLButtonElement[] = $state([]);
+   let grid: HTMLDivElement;
+   let selectedImage = $state(0);
    let closingModal = false;
+   let columns = $state(3);
+
+   let ro = $state() as ResizeObserver;
 
    if (browser) {
+      ro = new ResizeObserver((entries) => {
+         const entry = entries[0];
+         columns = getComputedStyle(entry.target)
+            .getPropertyValue("grid-template-columns")
+            .split(" ").length;
+      });
+
       document.addEventListener("keydown", (e) => {
          if (e.key.includes("Arrow")) e.preventDefault();
 
@@ -42,30 +74,30 @@
          if (modal && modal.open) {
             if (e.key === "ArrowLeft") {
                selectedImage =
-                  (selectedImage - 1 + imagesArr.length) % imagesArr.length;
-               loader.src = imagesArr[selectedImage - 1].img.src;
+                  (selectedImage - 1 + images.length) % images.length;
+               loader.src = images[selectedImage - 1].img.src;
             } else if (e.key === "ArrowRight") {
-               selectedImage = (selectedImage + 1) % imagesArr.length;
-               loader.src = imagesArr[selectedImage + 1].img.src;
+               selectedImage = (selectedImage + 1) % images.length;
+               loader.src = images[selectedImage + 1].img.src;
             }
          } else {
             switch (e.key) {
                case "ArrowLeft":
                   selectedImage =
-                     (selectedImage - 1 + imagesArr.length) % imagesArr.length;
+                     (selectedImage - 1 + images.length) % images.length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowRight":
-                  selectedImage = (selectedImage + 1) % imagesArr.length;
+                  selectedImage = (selectedImage + 1) % images.length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowUp":
                   selectedImage =
-                     (selectedImage - 3 + imagesArr.length) % imagesArr.length;
+                     (selectedImage - columns + images.length) % images.length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowDown":
-                  selectedImage = (selectedImage + 3) % imagesArr.length;
+                  selectedImage = (selectedImage + columns) % images.length;
                   buttons[selectedImage]?.focus();
                   break;
             }
@@ -73,11 +105,31 @@
       });
    }
 
-   $inspect(selectedImage);
+   function handleClick(e: MouseEvent, index: number) {
+      if (e.shiftKey || e.ctrlKey) {
+         e.stopPropagation();
+      }
+
+      console.log(e, index);
+      if (nsfwData[index]) {
+         nsfwData[index] = null;
+      } else {
+         if (e.ctrlKey) {
+            nsfwData[index] = "blood";
+         } else if (e.shiftKey) {
+            nsfwData[index] = "nudity";
+         }
+      }
+
+      images[index].data.nsfw = nsfwData[index];
+
+      console.log(nsfwData[index]);
+      console.log(images);
+   }
 </script>
 
 <svelte:head>
-   {#each imagesArr as image, index}
+   {#each images as image, index}
       {#if image && index < 10}
          <link rel="prerender" href={image.img.src} />
       {/if}
@@ -89,8 +141,8 @@
 
 <div class="screenshots">
    <h1>Screenshots</h1>
-   <div class="grid">
-      {#each imagesArr as image, index}
+   <div class="grid" bind:this={grid} use:ro.observe>
+      {#each images as image, index}
          <button
             bind:this={buttons[index]}
             aria-label="Image"
@@ -99,21 +151,29 @@
                selectedImage = index;
                modal.showModal();
                closingModal = true;
-               loader.src = imagesArr[index + 1]?.img.src;
+               loader.src = images[index + 1]?.img.src;
             }}
             onmouseenter={() => {
                loader.src = image.img.src;
             }}
             onfocus={() => {
-               console.log(closingModal);
-
                if (!closingModal) {
                   loader.src = image.img.src;
                   selectedImage = index;
                }
             }}
          >
-            <enhanced:img src={image} alt="Game screenshot {index + 1}" />
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <enhanced:img
+               src={image}
+               alt="Game screenshot {index + 1}"
+               class:blur={image.data.nsfw}
+               onclick={(event) => {
+                  if (!dev) return;
+                  handleClick(event, index);
+               }}
+            />
          </button>
       {/each}
    </div>
@@ -128,15 +188,14 @@
    onclose={() => {
       buttons[selectedImage]?.focus();
       closingModal = false;
-      console.log("closing");
    }}
 >
    <img
       bind:this={modalImage}
       alt="Screenshot"
-      src={imagesArr[selectedImage]?.img.src}
-      width={imagesArr[selectedImage]?.img.w}
-      height={imagesArr[selectedImage]?.img.h}
+      src={images[selectedImage]?.img.src}
+      width={images[selectedImage]?.img.w}
+      height={images[selectedImage]?.img.h}
    />
 </dialog>
 
@@ -173,11 +232,10 @@
       align-items: center;
       gap: 2rem;
       margin-block-end: 2rem;
-      width: 65rem;
 
       .grid {
          display: grid;
-         grid-template-columns: repeat(3, 1fr);
+         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
          gap: 1rem;
          width: 100%;
          align-items: center;
@@ -201,6 +259,11 @@
                object-fit: contain;
                opacity: 1;
                transition: filter 500ms;
+
+               &.blur {
+                  filter: blur(1rem);
+                  clip-path: inset(0);
+               }
             }
          }
       }
