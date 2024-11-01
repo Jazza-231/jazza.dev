@@ -1,5 +1,6 @@
 <script lang="ts">
    import { browser, dev } from "$app/environment";
+   import { Dropdown } from "$lib/Icons";
 
    const imports = import.meta.glob(
       "/src/lib/images/screenshots-cropped/**/*.{png,jpg}",
@@ -34,24 +35,55 @@
       (src) => src.match(location)?.[1] || "Unknown",
    );
 
-   const images = imagesArr.map((image, index) => {
-      return {
-         ...image,
-         data: {
-            game: imagesLocation[index],
-            nsfw: nsfwData[index],
-         },
+   type ImageDataObject = ImageObject & {
+      data: {
+         nsfw: string | null;
+         game: string;
+         fullGame: string;
       };
-   });
+   };
 
-   console.log(images);
+   const images = imagesArr.map((image, index) => ({
+      ...image,
+      data: {
+         game: imagesLocation[index],
+         nsfw: nsfwData[index],
+      },
+   }));
+
+   const games: Record<string, string> = {
+      rdr2: "Red Dead Redemption 2",
+      forza: "Forza Horizon 5",
+      cyberpunk: "Cyberpunk 2077",
+   };
+
+   const imagesByGame = images.reduce(
+      (acc, image) => {
+         const game = image.data.game;
+
+         if (!acc[game]) acc[game] = [];
+
+         acc[game].push({
+            sources: image.sources,
+            img: image.img,
+            data: {
+               nsfw: image.data.nsfw,
+               game,
+               fullGame: games[game],
+            },
+         });
+
+         return acc;
+      },
+      {} as Record<string, ImageDataObject[]>,
+   );
 
    let modalImage: HTMLImageElement;
    let modal: HTMLDialogElement;
    let loader: HTMLImageElement;
    let buttons: HTMLButtonElement[] = $state([]);
-   let grid: HTMLDivElement;
    let selectedImage = $state(0);
+   let selectedGame = $state("");
    let closingModal = false;
    let columns = $state(3);
 
@@ -74,30 +106,41 @@
          if (modal && modal.open) {
             if (e.key === "ArrowLeft") {
                selectedImage =
-                  (selectedImage - 1 + images.length) % images.length;
-               loader.src = images[selectedImage - 1].img.src;
+                  (selectedImage - 1 + imagesByGame[selectedGame].length) %
+                  imagesByGame[selectedGame].length;
+               loader.src =
+                  imagesByGame[selectedGame][selectedImage - 1].img.src;
             } else if (e.key === "ArrowRight") {
-               selectedImage = (selectedImage + 1) % images.length;
-               loader.src = images[selectedImage + 1].img.src;
+               selectedImage =
+                  (selectedImage + 1) % imagesByGame[selectedGame].length;
+               loader.src =
+                  imagesByGame[selectedGame][selectedImage + 1].img.src;
             }
          } else {
             switch (e.key) {
                case "ArrowLeft":
                   selectedImage =
-                     (selectedImage - 1 + images.length) % images.length;
+                     (selectedImage - 1 + imagesByGame[selectedGame].length) %
+                     imagesByGame[selectedGame].length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowRight":
-                  selectedImage = (selectedImage + 1) % images.length;
+                  selectedImage =
+                     (selectedImage + 1) % imagesByGame[selectedGame].length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowUp":
                   selectedImage =
-                     (selectedImage - columns + images.length) % images.length;
+                     (selectedImage -
+                        columns +
+                        imagesByGame[selectedGame].length) %
+                     imagesByGame[selectedGame].length;
                   buttons[selectedImage]?.focus();
                   break;
                case "ArrowDown":
-                  selectedImage = (selectedImage + columns) % images.length;
+                  selectedImage =
+                     (selectedImage + columns) %
+                     imagesByGame[selectedGame].length;
                   buttons[selectedImage]?.focus();
                   break;
             }
@@ -126,6 +169,16 @@
       console.log(nsfwData[index]);
       console.log(images);
    }
+
+   let collapsed: Record<string, boolean> = $state({});
+   $inspect(collapsed);
+
+   $effect(() => {
+      const gameKeys = Object.keys(imagesByGame);
+      gameKeys.forEach((game, index) => {
+         collapsed[game] = index === 0 ? false : true;
+      });
+   });
 </script>
 
 <svelte:head>
@@ -141,42 +194,71 @@
 
 <div class="screenshots">
    <h1>Screenshots</h1>
-   <div class="grid" bind:this={grid} use:ro.observe>
-      {#each images as image, index}
-         <button
-            bind:this={buttons[index]}
-            aria-label="Image"
-            class="image-container"
-            onclick={() => {
-               selectedImage = index;
-               modal.showModal();
-               closingModal = true;
-               loader.src = images[index + 1]?.img.src;
-            }}
-            onmouseenter={() => {
-               loader.src = image.img.src;
-            }}
-            onfocus={() => {
-               if (!closingModal) {
-                  loader.src = image.img.src;
+   {#each Object.values(imagesByGame) as images}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+      <h2
+         onclick={() => {
+            let current = collapsed[images[0].data.game];
+
+            const collapsedKeys = Object.keys(collapsed);
+            collapsedKeys.forEach((key) => {
+               collapsed[key] = true;
+            });
+
+            collapsed[images[0].data.game] = !current;
+         }}
+         class:collapsed={collapsed[images[0].data.game]}
+      >
+         {images[0].data.fullGame}
+         <Dropdown />
+      </h2>
+      <div
+         class="grid"
+         use:ro.observe
+         class:hidden={collapsed[images[0].data.game]}
+      >
+         {#each images as image, index}
+            <button
+               bind:this={buttons[index]}
+               aria-label="Image"
+               class="image-container"
+               onclick={() => {
+                  selectedGame = images[0].data.game;
                   selectedImage = index;
-               }
-            }}
-         >
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <enhanced:img
-               src={image}
-               alt="Game screenshot {index + 1}"
-               class:blur={image.data.nsfw}
-               onclick={(event) => {
-                  if (!dev) return;
-                  handleClick(event, index);
+                  modal.showModal();
+                  closingModal = true;
+                  loader.src = images[index + 1]?.img.src;
+
+                  console.log(selectedGame, selectedImage);
+                  console.log(imagesByGame[selectedGame][selectedImage]);
                }}
-            />
-         </button>
-      {/each}
-   </div>
+               onmouseenter={() => {
+                  loader.src = image.img.src;
+               }}
+               onfocus={() => {
+                  if (!closingModal) {
+                     loader.src = image.img.src;
+                     selectedGame = images[0].data.game;
+                     selectedImage = index;
+                  }
+               }}
+            >
+               <!-- svelte-ignore a11y_click_events_have_key_events -->
+               <!-- svelte-ignore a11y_no_static_element_interactions -->
+               <enhanced:img
+                  src={image}
+                  alt="Game screenshot {index + 1}"
+                  class:blur={image.data.nsfw}
+                  onclick={(event) => {
+                     if (!dev) return;
+                     handleClick(event, index);
+                  }}
+               />
+            </button>
+         {/each}
+      </div>
+   {/each}
 </div>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -193,9 +275,9 @@
    <img
       bind:this={modalImage}
       alt="Screenshot"
-      src={images[selectedImage]?.img.src}
-      width={images[selectedImage]?.img.w}
-      height={images[selectedImage]?.img.h}
+      src={imagesByGame[selectedGame]?.[selectedImage]?.img.src}
+      width={imagesByGame[selectedGame]?.[selectedImage]?.img.w}
+      height={imagesByGame[selectedGame]?.[selectedImage]?.img.h}
    />
 </dialog>
 
@@ -233,12 +315,30 @@
       gap: 2rem;
       margin-block-end: 2rem;
 
+      h2 {
+         :global(svg) {
+            stroke: var(--primary);
+            scale: 1.5;
+            transition: transform 200ms;
+         }
+
+         &.collapsed {
+            :global(svg) {
+               transform: rotate(180deg);
+            }
+         }
+      }
+
       .grid {
          display: grid;
          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
          gap: 1rem;
          width: 100%;
          align-items: center;
+
+         &.hidden {
+            display: none;
+         }
 
          .image-container {
             display: flex;

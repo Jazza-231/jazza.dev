@@ -4,6 +4,7 @@ export { default as Link } from "./icons/Link.svelte";
 export { default as Post } from "./icons/Post.svelte";
 export { default as Image } from "./icons/Image.svelte";
 export { default as Three } from "./icons/Three.svelte";
+export { default as Dropdown } from "./icons/Dropdown.svelte";
 
 export { default as CloudflareDev } from "./icons/dev/Cloudflare.svelte";
 export { default as GithubDev } from "./icons/dev/Github.svelte";
