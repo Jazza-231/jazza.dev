@@ -179,6 +179,22 @@
          collapsed[game] = index === 0 ? false : true;
       });
    });
+
+   function calculateGlobalIndex(
+      selectedGame: string,
+      selectedImage: number,
+   ): number {
+      let totalImagesBefore = 0;
+
+      for (const game of Object.keys(imagesByGame)) {
+         if (game === selectedGame) {
+            break;
+         }
+         totalImagesBefore += imagesByGame[game].length;
+      }
+
+      return totalImagesBefore + selectedImage;
+   }
 </script>
 
 <svelte:head>
@@ -220,7 +236,7 @@
       >
          {#each images as image, index}
             <button
-               bind:this={buttons[index]}
+               bind:this={buttons[calculateGlobalIndex(image.data.game, index)]}
                aria-label="Image"
                class="image-container"
                onclick={() => {
