@@ -256,7 +256,7 @@
 
             const newGameIndex = gameNames.indexOf(selectedGame);
             if (newGameIndex !== -1) {
-               details[newGameIndex].open = true;
+               if (details[newGameIndex]) details[newGameIndex].open = true;
             }
 
             buttons[globalSelectedImage]?.focus();
