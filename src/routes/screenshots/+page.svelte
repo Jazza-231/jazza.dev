@@ -235,7 +235,7 @@
                      const newIndex =
                         currentLength > 1
                            ? (selectedImage + columns) % currentLength
-                           : 1;
+                           : -1;
                      if (newIndex < selectedImage) {
                         const { game, index } = getNextGameAndIndex(
                            selectedGame,
