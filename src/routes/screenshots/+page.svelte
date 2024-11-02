@@ -90,10 +90,52 @@
    let globalSelectedImage = $derived(
       calculateGlobalIndex(selectedGame, selectedImage),
    );
-   $inspect(globalSelectedImage);
-   $inspect(details);
 
    let ro = $state() as ResizeObserver;
+
+   function getCurrentGameImagesLength(game: string): number {
+      return imagesByGame[game]?.length || 0;
+   }
+
+   function getNextGameAndIndex(
+      currentGame: string,
+      currentIndex: number,
+      direction: 1 | -1,
+   ): { game: string; index: number } {
+      const gamesList = Object.keys(imagesByGame);
+      const currentGameIndex = gamesList.indexOf(currentGame);
+
+      // If going forward and we're at the last image of the current game
+      if (
+         direction === 1 &&
+         currentIndex === getCurrentGameImagesLength(currentGame) - 1
+      ) {
+         const nextGameIndex = (currentGameIndex + 1) % gamesList.length;
+
+         return { game: gamesList[nextGameIndex], index: 0 };
+      }
+
+      // If going backward and we're at the first image of the current game
+      if (direction === -1 && currentIndex === 0) {
+         const previousGameIndex =
+            (currentGameIndex - 1 + gamesList.length) % gamesList.length;
+         const previousGame = gamesList[previousGameIndex];
+         return {
+            game: previousGame,
+            index: getCurrentGameImagesLength(previousGame) - 1,
+         };
+      }
+
+      // If we're not at a boundary, stay in the same game and just update the index
+      return {
+         game: currentGame,
+         index:
+            (currentIndex +
+               direction +
+               getCurrentGameImagesLength(currentGame)) %
+            getCurrentGameImagesLength(currentGame),
+      };
+   }
 
    if (browser) {
       ro = new ResizeObserver((entries) => {
@@ -106,50 +148,118 @@
       document.addEventListener("keydown", (e) => {
          if (e.key.includes("Arrow")) e.preventDefault();
 
-         // The old method worked by seeing an error (aka selectedImage was out of bounds)
-         // and then fixing it, this method means that the selected image will always be in bounds
-         // stopping the reactive usages of selectedImage from updating and causing an error
-
          if (modal && modal.open) {
+            const currentGameLength = getCurrentGameImagesLength(selectedGame);
+            if (!currentGameLength) return;
+
             if (e.key === "ArrowLeft") {
-               selectedImage =
-                  (selectedImage - 1 + images.length) % images.length;
-               loader.src = images[selectedImage - 1].img.src;
+               const { game, index } = getNextGameAndIndex(
+                  selectedGame,
+                  selectedImage,
+                  -1,
+               );
+               selectedGame = game;
+               selectedImage = index;
+               if (index > 0 || game !== selectedGame) {
+                  loader.src =
+                     imagesByGame[game][Math.max(0, index - 1)]?.img.src;
+               }
             } else if (e.key === "ArrowRight") {
-               selectedImage = (selectedImage + 1) % images.length;
-               loader.src = images[selectedImage + 1].img.src;
+               const { game, index } = getNextGameAndIndex(
+                  selectedGame,
+                  selectedImage,
+                  1,
+               );
+               selectedGame = game;
+               selectedImage = index;
+               if (
+                  index < getCurrentGameImagesLength(game) - 1 ||
+                  game !== selectedGame
+               ) {
+                  loader.src =
+                     imagesByGame[game][
+                        Math.min(
+                           getCurrentGameImagesLength(game) - 1,
+                           index + 1,
+                        )
+                     ]?.img.src;
+               }
             }
          } else {
-            switch (e.key) {
-               case "ArrowLeft":
-                  selectedImage =
-                     (selectedImage - 1 + images.length) % images.length;
-                  buttons[globalSelectedImage]?.focus();
+            const newState = (() => {
+               switch (e.key) {
+                  case "ArrowLeft": {
+                     const { game, index } = getNextGameAndIndex(
+                        selectedGame,
+                        selectedImage,
+                        -1,
+                     );
+                     return { game, index };
+                  }
+                  case "ArrowRight": {
+                     const { game, index } = getNextGameAndIndex(
+                        selectedGame,
+                        selectedImage,
+                        1,
+                     );
+                     return { game, index };
+                  }
+                  case "ArrowUp": {
+                     const currentLength =
+                        getCurrentGameImagesLength(selectedGame);
 
-                  break;
-               case "ArrowRight":
-                  selectedImage = (selectedImage + 1) % images.length;
-                  buttons[globalSelectedImage]?.focus();
+                     const newIndex =
+                        currentLength > 1
+                           ? (selectedImage - columns + currentLength) %
+                             currentLength
+                           : 1;
 
-                  break;
-               case "ArrowUp":
-                  selectedImage =
-                     (selectedImage - columns + images.length) % images.length;
-                  buttons[globalSelectedImage]?.focus();
+                     if (newIndex > selectedImage) {
+                        const { game, index } = getNextGameAndIndex(
+                           selectedGame,
+                           0,
+                           -1,
+                        );
 
-                  break;
-               case "ArrowDown":
-                  selectedImage = (selectedImage + columns) % images.length;
-                  buttons[globalSelectedImage]?.focus();
+                        return {
+                           game,
+                           index: getCurrentGameImagesLength(game) - 1,
+                        };
+                     }
+                     return { game: selectedGame, index: newIndex };
+                  }
+                  case "ArrowDown": {
+                     const currentLength =
+                        getCurrentGameImagesLength(selectedGame);
 
-                  break;
+                     const newIndex =
+                        currentLength > 1
+                           ? (selectedImage + columns) % currentLength
+                           : 1;
+                     if (newIndex < selectedImage) {
+                        const { game, index } = getNextGameAndIndex(
+                           selectedGame,
+                           currentLength - 1,
+                           1,
+                        );
+                        return { game, index: 0 };
+                     }
+                     return { game: selectedGame, index: newIndex };
+                  }
+                  default:
+                     return { game: selectedGame, index: selectedImage };
+               }
+            })();
+
+            selectedGame = newState.game;
+            selectedImage = newState.index;
+
+            const newGameIndex = gameNames.indexOf(selectedGame);
+            if (newGameIndex !== -1) {
+               details[newGameIndex].open = true;
             }
 
-            details[
-               gameNames.indexOf(
-                  getSelectedGameAndImage(globalSelectedImage).selectedGame,
-               )
-            ].open = true;
+            buttons[globalSelectedImage]?.focus();
          }
       });
    }
@@ -159,7 +269,6 @@
          e.stopPropagation();
       }
 
-      console.log(e, index);
       if (nsfwData[index]) {
          nsfwData[index] = null;
       } else {
@@ -243,10 +352,14 @@
                      selectedImage = index;
                      modal.showModal();
                      closingModal = true;
-                     loader.src = images[index + 1]?.img.src;
 
-                     console.log(selectedGame, selectedImage);
-                     console.log(imagesByGame[selectedGame][selectedImage]);
+                     // Get the next image, wrapping around to next category if needed
+                     const { game: nextGame, index: nextIndex } =
+                        getNextGameAndIndex(images[0].data.game, index, 1);
+
+                     if (nextGame && imagesByGame[nextGame]?.[nextIndex]) {
+                        loader.src = imagesByGame[nextGame][nextIndex].img.src;
+                     }
                   }}
                   onmouseenter={() => {
                      loader.src = image.img.src;
@@ -284,8 +397,21 @@
       modal.close();
    }}
    onclose={() => {
-      buttons[globalSelectedImage]?.focus();
       closingModal = false;
+
+      // Find and open the correct details section for the current game
+      const currentGameIndex = gameNames.indexOf(selectedGame);
+      if (currentGameIndex !== -1) {
+         // Close all details first
+         details.forEach((detail, index) => {
+            if (detail) detail.open = index === currentGameIndex;
+         });
+
+         // Wait for the browser to process the details opening
+         setTimeout(() => {
+            buttons[globalSelectedImage]?.focus();
+         }, 0);
+      }
    }}
 >
    <img
