@@ -1,6 +1,5 @@
 <script lang="ts">
    import { browser, dev } from "$app/environment";
-   import { Dropdown } from "$lib/Icons";
 
    const imports = import.meta.glob(
       "/src/lib/images/screenshots-cropped/**/*.{png,jpg}",
@@ -34,6 +33,7 @@
    const imagesLocation = Object.keys(imports).map(
       (src) => src.match(location)?.[1] || "Unknown",
    );
+   const gameNames = [...new Set(imagesLocation)];
 
    type ImageDataObject = ImageObject & {
       data: {
@@ -82,10 +82,16 @@
    let modal: HTMLDialogElement;
    let loader: HTMLImageElement;
    let buttons: HTMLButtonElement[] = $state([]);
+   let details: HTMLDetailsElement[] = $state([]);
    let selectedImage = $state(0);
-   let selectedGame = $state("");
+   let selectedGame = $state(gameNames[0]);
    let closingModal = false;
    let columns = $state(3);
+   let globalSelectedImage = $derived(
+      calculateGlobalIndex(selectedGame, selectedImage),
+   );
+   $inspect(globalSelectedImage);
+   $inspect(details);
 
    let ro = $state() as ResizeObserver;
 
@@ -103,47 +109,47 @@
          // The old method worked by seeing an error (aka selectedImage was out of bounds)
          // and then fixing it, this method means that the selected image will always be in bounds
          // stopping the reactive usages of selectedImage from updating and causing an error
+
          if (modal && modal.open) {
             if (e.key === "ArrowLeft") {
                selectedImage =
-                  (selectedImage - 1 + imagesByGame[selectedGame].length) %
-                  imagesByGame[selectedGame].length;
-               loader.src =
-                  imagesByGame[selectedGame][selectedImage - 1].img.src;
+                  (selectedImage - 1 + images.length) % images.length;
+               loader.src = images[selectedImage - 1].img.src;
             } else if (e.key === "ArrowRight") {
-               selectedImage =
-                  (selectedImage + 1) % imagesByGame[selectedGame].length;
-               loader.src =
-                  imagesByGame[selectedGame][selectedImage + 1].img.src;
+               selectedImage = (selectedImage + 1) % images.length;
+               loader.src = images[selectedImage + 1].img.src;
             }
          } else {
             switch (e.key) {
                case "ArrowLeft":
                   selectedImage =
-                     (selectedImage - 1 + imagesByGame[selectedGame].length) %
-                     imagesByGame[selectedGame].length;
-                  buttons[selectedImage]?.focus();
+                     (selectedImage - 1 + images.length) % images.length;
+                  buttons[globalSelectedImage]?.focus();
+
                   break;
                case "ArrowRight":
-                  selectedImage =
-                     (selectedImage + 1) % imagesByGame[selectedGame].length;
-                  buttons[selectedImage]?.focus();
+                  selectedImage = (selectedImage + 1) % images.length;
+                  buttons[globalSelectedImage]?.focus();
+
                   break;
                case "ArrowUp":
                   selectedImage =
-                     (selectedImage -
-                        columns +
-                        imagesByGame[selectedGame].length) %
-                     imagesByGame[selectedGame].length;
-                  buttons[selectedImage]?.focus();
+                     (selectedImage - columns + images.length) % images.length;
+                  buttons[globalSelectedImage]?.focus();
+
                   break;
                case "ArrowDown":
-                  selectedImage =
-                     (selectedImage + columns) %
-                     imagesByGame[selectedGame].length;
-                  buttons[selectedImage]?.focus();
+                  selectedImage = (selectedImage + columns) % images.length;
+                  buttons[globalSelectedImage]?.focus();
+
                   break;
             }
+
+            details[
+               gameNames.indexOf(
+                  getSelectedGameAndImage(globalSelectedImage).selectedGame,
+               )
+            ].open = true;
          }
       });
    }
@@ -165,20 +171,7 @@
       }
 
       images[index].data.nsfw = nsfwData[index];
-
-      console.log(nsfwData[index]);
-      console.log(images);
    }
-
-   let collapsed: Record<string, boolean> = $state({});
-   $inspect(collapsed);
-
-   $effect(() => {
-      const gameKeys = Object.keys(imagesByGame);
-      gameKeys.forEach((game, index) => {
-         collapsed[game] = index === 0 ? false : true;
-      });
-   });
 
    function calculateGlobalIndex(
       selectedGame: string,
@@ -195,6 +188,26 @@
 
       return totalImagesBefore + selectedImage;
    }
+
+   function getSelectedGameAndImage(globalIndex: number): {
+      selectedGame: string;
+      selectedImage: number;
+   } {
+      let totalImagesBefore = 0;
+
+      for (const game of Object.keys(imagesByGame)) {
+         const currentGameImages = imagesByGame[game].length;
+
+         if (totalImagesBefore + currentGameImages > globalIndex) {
+            const selectedImage = globalIndex - totalImagesBefore;
+            return { selectedGame: game, selectedImage };
+         }
+
+         totalImagesBefore += currentGameImages;
+      }
+
+      return { selectedGame: "", selectedImage: -1 }; // If not found
+   }
 </script>
 
 <svelte:head>
@@ -210,70 +223,57 @@
 
 <div class="screenshots">
    <h1>Screenshots</h1>
-   {#each Object.values(imagesByGame) as images}
+   {#each Object.values(imagesByGame) as images, index}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-      <h2
-         onclick={() => {
-            let current = collapsed[images[0].data.game];
-
-            const collapsedKeys = Object.keys(collapsed);
-            collapsedKeys.forEach((key) => {
-               collapsed[key] = true;
-            });
-
-            collapsed[images[0].data.game] = !current;
-         }}
-         class:collapsed={collapsed[images[0].data.game]}
-      >
-         {images[0].data.fullGame}
-         <Dropdown />
-      </h2>
-      <div
-         class="grid"
-         use:ro.observe
-         class:hidden={collapsed[images[0].data.game]}
-      >
-         {#each images as image, index}
-            <button
-               bind:this={buttons[calculateGlobalIndex(image.data.game, index)]}
-               aria-label="Image"
-               class="image-container"
-               onclick={() => {
-                  selectedGame = images[0].data.game;
-                  selectedImage = index;
-                  modal.showModal();
-                  closingModal = true;
-                  loader.src = images[index + 1]?.img.src;
-
-                  console.log(selectedGame, selectedImage);
-                  console.log(imagesByGame[selectedGame][selectedImage]);
-               }}
-               onmouseenter={() => {
-                  loader.src = image.img.src;
-               }}
-               onfocus={() => {
-                  if (!closingModal) {
-                     loader.src = image.img.src;
+      <details open={index === 0} name="pain" bind:this={details[index]}>
+         <summary>
+            {images[0].data.fullGame}
+         </summary>
+         <div class="grid" use:ro.observe>
+            {#each images as image, index}
+               <button
+                  bind:this={buttons[
+                     calculateGlobalIndex(image.data.game, index)
+                  ]}
+                  aria-label="Image"
+                  class="image-container"
+                  onclick={() => {
                      selectedGame = images[0].data.game;
                      selectedImage = index;
-                  }
-               }}
-            >
-               <!-- svelte-ignore a11y_click_events_have_key_events -->
-               <!-- svelte-ignore a11y_no_static_element_interactions -->
-               <enhanced:img
-                  src={image}
-                  alt="Game screenshot {index + 1}"
-                  class:blur={image.data.nsfw}
-                  onclick={(event) => {
-                     if (!dev) return;
-                     handleClick(event, index);
+                     modal.showModal();
+                     closingModal = true;
+                     loader.src = images[index + 1]?.img.src;
+
+                     console.log(selectedGame, selectedImage);
+                     console.log(imagesByGame[selectedGame][selectedImage]);
                   }}
-               />
-            </button>
-         {/each}
-      </div>
+                  onmouseenter={() => {
+                     loader.src = image.img.src;
+                  }}
+                  onfocus={() => {
+                     if (!closingModal) {
+                        loader.src = image.img.src;
+                        selectedGame = images[0].data.game;
+                        selectedImage = index;
+                     }
+                  }}
+               >
+                  <!-- svelte-ignore a11y_click_events_have_key_events -->
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
+                  <enhanced:img
+                     src={image}
+                     alt="Game screenshot {index + 1}"
+                     class:blur={image.data.nsfw}
+                     onclick={(event) => {
+                        if (!dev) return;
+                        handleClick(event, index);
+                     }}
+                  />
+               </button>
+            {/each}
+         </div>
+      </details>
    {/each}
 </div>
 
@@ -284,7 +284,7 @@
       modal.close();
    }}
    onclose={() => {
-      buttons[selectedImage]?.focus();
+      buttons[globalSelectedImage]?.focus();
       closingModal = false;
    }}
 >
@@ -311,7 +311,7 @@
          display: initial;
       }
       &::backdrop {
-         backdrop-filter: blur(0.5rem);
+         backdrop-filter: blur(0.75rem);
       }
 
       img {
@@ -331,17 +331,23 @@
       gap: 2rem;
       margin-block-end: 2rem;
 
-      h2 {
+      summary {
+         color: var(--primary);
+         font-size: 1.6rem;
+         width: fit-content;
+         margin-block-end: 1rem;
+         outline: transparent 2px solid;
+         padding: 0.4rem;
+         border-radius: 0.75rem;
+
+         &:focus-visible {
+            outline: var(--secondary) 2px solid;
+         }
+
          :global(svg) {
             stroke: var(--primary);
             scale: 1.5;
             transition: transform 200ms;
-         }
-
-         &.collapsed {
-            :global(svg) {
-               transform: rotate(180deg);
-            }
          }
       }
 
@@ -351,10 +357,6 @@
          gap: 1rem;
          width: 100%;
          align-items: center;
-
-         &.hidden {
-            display: none;
-         }
 
          .image-container {
             display: flex;
@@ -375,10 +377,11 @@
                object-fit: contain;
                opacity: 1;
                transition: filter 500ms;
+               border-radius: 0.75rem;
 
                &.blur {
                   filter: blur(1rem);
-                  clip-path: inset(0);
+                  clip-path: inset(0 0 0 0 round 0.75rem);
                }
             }
          }
