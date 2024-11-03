@@ -5,13 +5,13 @@
       "/src/lib/images/screenshots-cropped/**/*.{png,jpg}",
       {
          eager: true,
-         query: "enhanced&w=2560;1280;640",
+         query: "enhanced",
          import: "default",
       },
    );
 
    import nsfwDataImport from "./nsfw.json";
-   let nsfwData = $state(nsfwDataImport) as ["blood" | "nudity" | null];
+   let nsfwData = $state(nsfwDataImport) as ["gore" | "nudity" | null];
 
    $inspect(nsfwData);
 
@@ -53,6 +53,7 @@
 
    const games: Record<string, string> = {
       rdr2: "Red Dead Redemption 2",
+      rdr: "Red Dead Redemption",
       forza: "Forza Horizon 5",
       cyberpunk: "Cyberpunk 2077",
    };
@@ -69,7 +70,8 @@
             data: {
                nsfw: image.data.nsfw,
                game,
-               fullGame: games[game],
+               fullGame:
+                  games[game] || `${game} - also this an error, report to me`,
             },
          });
 
@@ -147,6 +149,7 @@
 
       document.addEventListener("keydown", (e) => {
          if (e.key.includes("Arrow")) e.preventDefault();
+         else return;
 
          if (modal && modal.open) {
             const currentGameLength = getCurrentGameImagesLength(selectedGame);
@@ -264,22 +267,24 @@
       });
    }
 
-   function handleClick(e: MouseEvent, index: number) {
+   function handleClick(e: MouseEvent) {
       if (e.shiftKey || e.ctrlKey) {
          e.stopPropagation();
       }
 
-      if (nsfwData[index]) {
-         nsfwData[index] = null;
+      const globalIndex = calculateGlobalIndex(selectedGame, selectedImage);
+
+      if (nsfwData[globalIndex]) {
+         nsfwData[globalIndex] = null;
       } else {
          if (e.ctrlKey) {
-            nsfwData[index] = "blood";
+            nsfwData[globalIndex] = "gore";
          } else if (e.shiftKey) {
-            nsfwData[index] = "nudity";
+            nsfwData[globalIndex] = "nudity";
          }
       }
 
-      images[index].data.nsfw = nsfwData[index];
+      images[globalIndex].data.nsfw = nsfwData[globalIndex];
    }
 
    function calculateGlobalIndex(
@@ -297,26 +302,6 @@
 
       return totalImagesBefore + selectedImage;
    }
-
-   function getSelectedGameAndImage(globalIndex: number): {
-      selectedGame: string;
-      selectedImage: number;
-   } {
-      let totalImagesBefore = 0;
-
-      for (const game of Object.keys(imagesByGame)) {
-         const currentGameImages = imagesByGame[game].length;
-
-         if (totalImagesBefore + currentGameImages > globalIndex) {
-            const selectedImage = globalIndex - totalImagesBefore;
-            return { selectedGame: game, selectedImage };
-         }
-
-         totalImagesBefore += currentGameImages;
-      }
-
-      return { selectedGame: "", selectedImage: -1 }; // If not found
-   }
 </script>
 
 <svelte:head>
@@ -330,13 +315,24 @@
 <!-- svelte-ignore a11y_missing_attribute -->
 <img bind:this={loader} hidden />
 
+<h1>Screenshots</h1>
+<h3>SPOILERS!!</h3>
+
 <div class="screenshots">
-   <h1>Screenshots</h1>
    {#each Object.values(imagesByGame) as images, index}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-      <details open={index === 0} name="pain" bind:this={details[index]}>
-         <summary>
+      <details
+         open={index === 0}
+         name="pain"
+         bind:this={details[index]}
+         ontoggle={() => {
+            if (details[index].open) {
+               details[index].scrollIntoView({ behavior: "smooth" });
+            }
+         }}
+      >
+         <summary id={images[0].data.game}>
             {images[0].data.fullGame}
          </summary>
          <div class="grid" use:ro.observe>
@@ -380,7 +376,7 @@
                      class:blur={image.data.nsfw}
                      onclick={(event) => {
                         if (!dev) return;
-                        handleClick(event, index);
+                        handleClick(event);
                      }}
                   />
                </button>
@@ -391,9 +387,11 @@
 </div>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <dialog
+   aria-label="Screenshot modal"
    bind:this={modal}
-   onmousedown={() => {
+   onclick={() => {
       modal.close();
    }}
    onclose={() => {
@@ -424,6 +422,14 @@
 </dialog>
 
 <style>
+   h1 {
+      text-align: center;
+   }
+   h3 {
+      font-size: 0.9rem;
+      text-align: center;
+      margin-block-start: -1rem;
+   }
    dialog {
       border: none;
       background-color: var(--background);
@@ -441,8 +447,8 @@
       }
 
       img {
-         max-width: 90vw;
-         max-height: 80vh;
+         max-width: 95vw;
+         max-height: 85vh;
          height: auto;
          width: auto;
          object-fit: contain;
@@ -456,6 +462,10 @@
       align-items: center;
       gap: 2rem;
       margin-block-end: 2rem;
+
+      details {
+         scroll-margin-block-start: 6rem;
+      }
 
       summary {
          color: var(--primary);

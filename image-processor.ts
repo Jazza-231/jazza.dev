@@ -3,8 +3,6 @@ import fs from "fs";
 import path from "path";
 
 const deleteAndRecreateOutputDir = async (outDir: string) => {
-   console.log(fs.existsSync(outDir));
-
    if (fs.existsSync(outDir)) {
       try {
          fs.rmSync(outDir, { recursive: true });
