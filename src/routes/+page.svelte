@@ -4,10 +4,10 @@
    const { data } = $props();
    const { age } = data;
 
-   import ScratchAddonsImage from "$lib/images/bento/ScratchAddons.avif?enhanced";
-   import MediaScoutImage from "$lib/images/bento/MediaScout.avif?enhanced";
-   import WebsiteImage from "$lib/images/bento/Website.avif?enhanced";
-   import LoremPicsumImage from "$lib/images/bento/LoremPicsum.avif?enhanced";
+   import ScratchAddonsImage from "$lib/images/bento/ScratchAddons.avif";
+   import MediaScoutImage from "$lib/images/bento/MediaScout.avif";
+   import WebsiteImage from "$lib/images/bento/Website.avif";
+   import LoremPicsumImage from "$lib/images/bento/LoremPicsum.avif";
 </script>
 
 <!-- PLEASE DO REACTIVITY SOMETIME https://www.youtube.com/watch?v=x4u1yp3Msao -->

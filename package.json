@@ -39,7 +39,6 @@
    "dependencies": {
       "@fontsource-variable/inter": "^5.1.0",
       "@sveltejs/adapter-cloudflare": "^4.7.3",
-      "@sveltejs/enhanced-img": "^0.3.10",
       "@threlte/core": "8.0.0-next.17",
       "@threlte/extras": "9.0.0-next.26",
       "@types/color": "^3.0.6",

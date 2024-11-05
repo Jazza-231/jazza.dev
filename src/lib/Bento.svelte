@@ -1,7 +1,6 @@
 <script lang="ts">
    const props = $props();
-   const { header, short, content, href, area, children, imageName, image } =
-      props;
+   const { header, short, content, href, area, children, image } = props;
 
    const bentoClass = header.toLowerCase().replaceAll(" ", "-");
 </script>
@@ -18,7 +17,7 @@
          {/if}
       </div>
       <div class="image-container">
-         <enhanced:img src={image} alt={header} />
+         <img src={image} alt={header} />
       </div>
    </a>
 </div>
