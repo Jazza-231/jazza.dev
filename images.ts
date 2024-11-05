@@ -15,6 +15,17 @@ type ImageFormat =
    | "heif"
    | "heic";
 
+interface ImageMetadata {
+   width: number;
+   height: number;
+   game: string;
+   path: string;
+}
+
+interface GameMetadata {
+   [game: string]: ImageMetadata[];
+}
+
 interface ImageOptimizationOptions {
    width?: number;
    quality?: number;
@@ -27,6 +38,7 @@ interface ImageOptimizationOptions {
    trimBlackBorders?: boolean;
    trimThreshold?: number;
    omitOptimized?: boolean;
+   outputMetadata?: boolean;
 }
 
 let imagesProcessed = 0;
@@ -40,6 +52,7 @@ async function optimizeImages(
    options: ImageOptimizationOptions,
 ): Promise<void> {
    startTime = Date.now();
+   const metadata: GameMetadata = {};
 
    const outputDir = path.resolve(process.cwd(), options.outputPath || ".");
    console.log(`Output directory: ${outputDir}`);
@@ -48,8 +61,18 @@ async function optimizeImages(
 
    for (const folderPath of folderPaths) {
       console.log(`Processing folder: ${folderPath}`);
-      await optimizeImagesInFolder(folderPath, options, outputDir, folderPath);
+      await optimizeImagesInFolder(
+         folderPath,
+         options,
+         outputDir,
+         folderPath,
+         metadata,
+      );
    }
+
+   // Save metadata to JSON file
+   const metadataPath = path.join(outputDir, "screenshots-metadata.json");
+   await fs.promises.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
 
    const elapsedTime = Date.now() - startTime;
    console.log(
@@ -67,8 +90,17 @@ async function optimizeImagesInFolder(
    options: ImageOptimizationOptions,
    outputDir: string,
    baseInputPath: string,
+   metadata: GameMetadata,
 ): Promise<void> {
    const files = await fs.promises.readdir(folderPath);
+
+   // Get game name from folder path
+   const game =
+      path.relative(baseInputPath, folderPath).split(path.sep)[0] || "default";
+
+   if (!metadata[game]) {
+      metadata[game] = [];
+   }
 
    for (const file of files) {
       const filePath = path.join(folderPath, file);
@@ -80,10 +112,25 @@ async function optimizeImagesInFolder(
             options,
             outputDir,
             baseInputPath,
+            metadata,
          );
       } else if (isImageFile(file)) {
          const relativeImagePath = path.relative(baseInputPath, filePath);
-         await optimizeImage(filePath, options, outputDir, relativeImagePath);
+         const imageMetadata = await optimizeImage(
+            filePath,
+            options,
+            outputDir,
+            relativeImagePath,
+         );
+
+         if (imageMetadata) {
+            metadata[game].push({
+               width: imageMetadata.width,
+               height: imageMetadata.height,
+               game,
+               path: relativeImagePath,
+            });
+         }
       }
    }
 }
@@ -93,7 +140,7 @@ async function optimizeImage(
    options: ImageOptimizationOptions,
    outputDir: string,
    relativeImagePath: string,
-): Promise<void> {
+): Promise<{ width: number; height: number } | null> {
    const {
       width,
       quality,
@@ -118,7 +165,7 @@ async function optimizeImage(
          console.error(
             `Error optimizing image: ${imagePath}, could not get dimensions`,
          );
-         return;
+         return null;
       }
 
       const originalResolution = `${metadata.width}x${metadata.height}`;
@@ -143,14 +190,25 @@ async function optimizeImage(
       }
 
       // Process image with options
-      const resizedImage = originalImage.resize(newWidth, newHeight, {
+      let processedImage = originalImage.resize(newWidth, newHeight, {
          fit: crop ? "cover" : keepAspect ? "contain" : "fill",
          withoutEnlargement: true,
          position: "center",
       });
 
       if (trimBlackBorders) {
-         resizedImage.trim({ background: "black", threshold: trimThreshold });
+         processedImage = processedImage.trim({
+            background: "black",
+            threshold: trimThreshold,
+         });
+      }
+
+      if (blur) {
+         processedImage = processedImage.blur(blur);
+      }
+
+      if (grayscale) {
+         processedImage = processedImage.grayscale();
       }
 
       // Set format and output file path
@@ -159,23 +217,20 @@ async function optimizeImage(
          `.${omitOptimized ? "" : "optimized."}${format || path.extname(outputPath).slice(1)}`,
       );
 
-      if (blur) {
-         resizedImage.blur(blur);
-      }
-
-      if (grayscale) {
-         resizedImage.grayscale();
-      }
-
       // Apply the selected format to the resized image
       if (format) {
-         await resizedImage
+         await processedImage
             // @ts-expect-error - Sharp allows strings here
             .toFormat(format, { quality })
             .toFile(outputFilePath);
       } else {
-         await resizedImage.toFile(outputFilePath);
+         await processedImage.toFile(outputFilePath);
       }
+
+      // Get the final metadata after all transformations
+      const finalMetadata = await sharp(outputFilePath).metadata();
+      const finalWidth = finalMetadata.width || newWidth;
+      const finalHeight = finalMetadata.height || newHeight;
 
       // Get optimized file size
       const optimizedFileSizeKB =
@@ -196,7 +251,7 @@ async function optimizeImage(
 
       console.log(`Optimized image: ${imagePath}`);
       console.log(
-         `  Resolution: ${originalResolution} -> ${newWidth}x${newHeight}`,
+         `  Resolution: ${originalResolution} -> ${finalWidth}x${finalHeight}`,
       );
       console.log(`  Format: ${originalFormat} -> ${format || originalFormat}`);
       console.log(
@@ -209,9 +264,15 @@ async function optimizeImage(
       console.log(`  ${blur ? `Applied blur of ${blur}px` : ""}`);
       console.log("");
       imagesProcessed++;
+
+      return {
+         width: finalWidth,
+         height: finalHeight,
+      };
    } catch (error) {
       console.error(`Error optimizing image: ${imagePath}`, error);
       imagesFailed++;
+      return null;
    }
 }
 
@@ -236,6 +297,7 @@ optimizeImages(["images/screenshots/"], {
    outputPath: "src/lib/images/screenshots/",
    trimBlackBorders: true,
    trimThreshold: 10,
+   outputMetadata: true,
 });
 
 optimizeImages(["images/bento/"], {

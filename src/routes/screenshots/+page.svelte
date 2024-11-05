@@ -1,15 +1,13 @@
 <script lang="ts">
-   const imports = Object.values(
-      import.meta.glob("$lib/images/screenshots/*.avif", {
-         eager: false,
+   const imageURLs = Object.values(
+      import.meta.glob("$lib/images/screenshots/**/*.avif", {
+         eager: true,
          query: "?url",
          import: "default",
       }),
    );
 
-   (async () => {
-      console.log(await imports[0]());
-   })();
+   console.log(imageURLs);
 </script>
 
 <h1>Screenshots</h1>
