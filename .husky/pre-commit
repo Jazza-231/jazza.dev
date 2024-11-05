@@ -1,4 +1,0 @@
-echo "Test"
-node ".husky/images.js"
-
-exit 1

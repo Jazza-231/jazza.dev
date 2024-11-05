@@ -13,7 +13,7 @@
       "format": "prettier --write .",
       "test:integration": "playwright test",
       "test:unit": "vitest",
-      "prepare": "husky"
+      "images": "tsx images.ts"
    },
    "devDependencies": {
       "@playwright/test": "^1.48.1",
@@ -47,7 +47,6 @@
       "color": "^4.2.3",
       "detect-gpu": "^5.0.53",
       "gsap": "^3.12.5",
-      "husky": "^9.1.6",
       "sharp": "^0.33.5",
       "three": "^0.168.0"
    }
