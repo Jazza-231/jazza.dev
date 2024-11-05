@@ -59,20 +59,26 @@ async function optimizeImages(
 
    fs.rmSync(outputDir, { recursive: true, force: true });
 
-   for (const folderPath of folderPaths) {
-      console.log(`Processing folder: ${folderPath}`);
-      await optimizeImagesInFolder(
+   const optimizePromises = folderPaths.map((folderPath) =>
+      optimizeImagesInFolder(
          folderPath,
          options,
          outputDir,
          folderPath,
          metadata,
-      );
-   }
+      ),
+   );
+
+   await Promise.all(optimizePromises);
 
    // Save metadata to JSON file
-   const metadataPath = path.join(outputDir, "screenshots-metadata.json");
-   await fs.promises.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+   if (options.outputMetadata) {
+      const metadataPath = path.join(outputDir, "screenshots-metadata.json");
+      await fs.promises.writeFile(
+         metadataPath,
+         JSON.stringify(metadata, null, 2),
+      );
+   }
 
    const elapsedTime = Date.now() - startTime;
    console.log(
