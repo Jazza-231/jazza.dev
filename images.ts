@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
-import sharp from "sharp";
+import { Worker } from "worker_threads";
+import { cpus } from "os";
 
 type ImageFormat =
    | "jpeg"
@@ -41,37 +42,185 @@ interface ImageOptimizationOptions {
    outputMetadata?: boolean;
 }
 
-let imagesProcessed = 0;
-let imagesFailed = 0;
-let startTime: number;
-let overallOriginalSize = 0;
-let overallOptimizedSize = 0;
+interface WorkerData {
+   imagePath: string;
+   options: ImageOptimizationOptions;
+   outputDir: string;
+   relativeImagePath: string;
+}
+
+interface WorkerResult {
+   success: boolean;
+   metadata?: {
+      width: number;
+      height: number;
+      originalFormat: string;
+      originalResolution: string;
+   };
+   stats?: {
+      originalSize: number;
+      optimizedSize: number;
+      format: string;
+   };
+}
+
+class WorkerPool {
+   private workers: Worker[] = [];
+   private queue: WorkerData[] = [];
+   private activeWorkers = 0;
+   private results: Map<string, WorkerResult> = new Map();
+   private resolvePromise?: (value: Map<string, WorkerResult>) => void;
+
+   constructor(private numWorkers: number) {}
+
+   private async logResult(task: WorkerData, result: WorkerResult) {
+      if (result.success && result.metadata && result.stats) {
+         const { originalResolution } = result.metadata;
+         const { originalSize, optimizedSize, format } = result.stats;
+
+         // Convert bytes to KB
+         const originalSizeKB = originalSize / 1024;
+         const optimizedSizeKB = optimizedSize / 1024;
+
+         // Calculate size difference percentage
+         const sizeDifferencePercent =
+            ((optimizedSizeKB - originalSizeKB) / originalSizeKB) * 100;
+         const sizeDifferenceLabel =
+            sizeDifferencePercent >= 0 ? "increase" : "reduction";
+
+         // Calculate load times (1.5 Mbps = 0.1875 MB/s)
+         const slow4GSpeed = 0.1875; // MB/s
+         const originalLoadTime = originalSizeKB / 1024 / slow4GSpeed;
+         const optimizedLoadTime = optimizedSizeKB / 1024 / slow4GSpeed;
+
+         console.log(`Optimized image: ${task.imagePath}`);
+         console.log(
+            `  Resolution: ${originalResolution} -> ${result.metadata.width}x${result.metadata.height}`,
+         );
+         console.log(
+            `  Format: ${result.metadata.originalFormat} -> ${format}`,
+         );
+         console.log(
+            `  Size: ${originalSizeKB.toFixed(2)} KB -> ${optimizedSizeKB.toFixed(2)} KB ` +
+               `(${Math.abs(sizeDifferencePercent).toFixed(2)}% ${sizeDifferenceLabel})`,
+         );
+         console.log(
+            `  Estimated load time: ${originalLoadTime.toFixed(2)}s -> ${optimizedLoadTime.toFixed(2)}s on slow 4G`,
+         );
+         console.log(
+            `  ${task.options.blur ? `Applied blur of ${task.options.blur}px` : ""}`,
+         );
+         console.log("");
+      }
+   }
+
+   async process(tasks: WorkerData[]): Promise<Map<string, WorkerResult>> {
+      this.queue.push(...tasks);
+
+      return new Promise((resolve) => {
+         this.resolvePromise = resolve;
+         for (let i = 0; i < this.numWorkers; i++) {
+            this.createWorker();
+         }
+      });
+   }
+
+   private createWorker() {
+      if (this.queue.length === 0 && this.activeWorkers === 0) {
+         if (this.resolvePromise) {
+            this.resolvePromise(this.results);
+         }
+         return;
+      }
+
+      if (this.queue.length === 0) return;
+
+      const task = this.queue.shift()!;
+      const worker = new Worker("./worker.js", {
+         workerData: task,
+      });
+
+      this.activeWorkers++;
+
+      worker.on("message", async (result: WorkerResult) => {
+         this.results.set(task.imagePath, result);
+         await this.logResult(task, result);
+      });
+
+      worker.on("error", (error) => {
+         console.error(`Worker error processing ${task.imagePath}:`, error);
+         this.results.set(task.imagePath, { success: false });
+      });
+
+      worker.on("exit", () => {
+         this.activeWorkers--;
+         this.createWorker();
+      });
+   }
+}
 
 async function optimizeImages(
    folderPaths: string[],
    options: ImageOptimizationOptions,
 ): Promise<void> {
-   startTime = Date.now();
+   const startTime = Date.now();
    const metadata: GameMetadata = {};
+   let imagesProcessed = 0;
+   let imagesFailed = 0;
+   let overallOriginalSize = 0;
+   let overallOptimizedSize = 0;
 
    const outputDir = path.resolve(process.cwd(), options.outputPath || ".");
    console.log(`Output directory: ${outputDir}`);
 
    fs.rmSync(outputDir, { recursive: true, force: true });
 
-   const optimizePromises = folderPaths.map((folderPath) =>
-      optimizeImagesInFolder(
+   // Collect all image tasks
+   const tasks: WorkerData[] = [];
+   for (const folderPath of folderPaths) {
+      await collectImageTasks(
          folderPath,
          options,
          outputDir,
          folderPath,
-         metadata,
-      ),
+         tasks,
+      );
+   }
+
+   // Process images
+   const workerPool = new WorkerPool(NUM_WORKERS);
+   console.log(
+      `Processing with ${USE_MULTITHREADING ? "multithreading enabled" : "single thread"} (${NUM_WORKERS} worker${NUM_WORKERS > 1 ? "s" : ""})`,
    );
+   const results = await workerPool.process(tasks);
 
-   await Promise.all(optimizePromises);
+   // Process results
+   for (const [imagePath, result] of results) {
+      if (result.success && result.metadata && result.stats) {
+         imagesProcessed++;
+         overallOriginalSize += result.stats.originalSize;
+         overallOptimizedSize += result.stats.optimizedSize;
 
-   // Save metadata to JSON file
+         // Update metadata
+         const game =
+            path
+               .relative(folderPaths[0], path.dirname(imagePath))
+               .split(path.sep)[0] || "default";
+         if (!metadata[game]) {
+            metadata[game] = [];
+         }
+         metadata[game].push({
+            width: result.metadata.width,
+            height: result.metadata.height,
+            game,
+            path: path.relative(folderPaths[0], imagePath),
+         });
+      } else {
+         imagesFailed++;
+      }
+   }
+
+   // Save metadata
    if (options.outputMetadata) {
       const metadataPath = path.join(outputDir, "screenshots-metadata.json");
       await fs.promises.writeFile(
@@ -81,204 +230,47 @@ async function optimizeImages(
    }
 
    const elapsedTime = Date.now() - startTime;
+   const originalSizeMB = overallOriginalSize / (1024 * 1024);
+   const optimizedSizeMB = overallOptimizedSize / (1024 * 1024);
+
    console.log(
       `Processed ${imagesProcessed} images, failed ${imagesFailed} images in ${elapsedTime / 1000}s`,
    );
    console.log(
-      `Original size: ${(overallOriginalSize / 1024).toFixed(2)} MB, optimized size: ${(
-         overallOptimizedSize / 1024
-      ).toFixed(2)} MB`,
+      `Original size: ${originalSizeMB.toFixed(2)} MB, optimized size: ${optimizedSizeMB.toFixed(2)} MB`,
    );
 }
 
-async function optimizeImagesInFolder(
+async function collectImageTasks(
    folderPath: string,
    options: ImageOptimizationOptions,
    outputDir: string,
    baseInputPath: string,
-   metadata: GameMetadata,
+   tasks: WorkerData[],
 ): Promise<void> {
    const files = await fs.promises.readdir(folderPath);
-
-   // Get game name from folder path
-   const game =
-      path.relative(baseInputPath, folderPath).split(path.sep)[0] || "default";
-
-   if (!metadata[game]) {
-      metadata[game] = [];
-   }
 
    for (const file of files) {
       const filePath = path.join(folderPath, file);
       const stats = await fs.promises.stat(filePath);
 
       if (stats.isDirectory()) {
-         await optimizeImagesInFolder(
+         await collectImageTasks(
             filePath,
             options,
             outputDir,
             baseInputPath,
-            metadata,
+            tasks,
          );
       } else if (isImageFile(file)) {
          const relativeImagePath = path.relative(baseInputPath, filePath);
-         const imageMetadata = await optimizeImage(
-            filePath,
+         tasks.push({
+            imagePath: filePath,
             options,
             outputDir,
             relativeImagePath,
-         );
-
-         if (imageMetadata) {
-            metadata[game].push({
-               width: imageMetadata.width,
-               height: imageMetadata.height,
-               game,
-               path: relativeImagePath,
-            });
-         }
-      }
-   }
-}
-
-async function optimizeImage(
-   imagePath: string,
-   options: ImageOptimizationOptions,
-   outputDir: string,
-   relativeImagePath: string,
-): Promise<{ width: number; height: number } | null> {
-   const {
-      width,
-      quality,
-      format,
-      blur,
-      grayscale,
-      keepAspect,
-      crop,
-      trimBlackBorders,
-      trimThreshold,
-      omitOptimized,
-   } = options;
-   const outputPath = path.join(outputDir, relativeImagePath);
-
-   try {
-      await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
-
-      // Get original metadata and size for logging
-      const originalImage = sharp(imagePath);
-      const metadata = await originalImage.metadata();
-      if (!(metadata.width && metadata.height)) {
-         console.error(
-            `Error optimizing image: ${imagePath}, could not get dimensions`,
-         );
-         return null;
-      }
-
-      const originalResolution = `${metadata.width}x${metadata.height}`;
-      const originalFormat = metadata.format;
-
-      // Get original file size in KB using fs.stat
-      const originalFileSizeKB =
-         (await fs.promises.stat(imagePath)).size / 1024;
-      overallOriginalSize += originalFileSizeKB;
-
-      // Set the new dimensions based on the aspect ratio
-      let newWidth = width || metadata.width;
-      let newHeight = metadata.height; // Default to original height
-
-      if (width && keepAspect) {
-         // Calculate the new height to maintain the aspect ratio
-         newHeight = Math.round((width / metadata.width) * metadata.height);
-      } else if (!width && !keepAspect) {
-         // If no width and not keeping aspect, use original dimensions
-         newWidth = metadata.width;
-         newHeight = metadata.height;
-      }
-
-      // Process image with options
-      let processedImage = originalImage.resize(newWidth, newHeight, {
-         fit: crop ? "cover" : keepAspect ? "contain" : "fill",
-         withoutEnlargement: true,
-         position: "center",
-      });
-
-      if (trimBlackBorders) {
-         processedImage = processedImage.trim({
-            background: "black",
-            threshold: trimThreshold,
          });
       }
-
-      if (blur) {
-         processedImage = processedImage.blur(blur);
-      }
-
-      if (grayscale) {
-         processedImage = processedImage.grayscale();
-      }
-
-      // Set format and output file path
-      const outputFilePath = outputPath.replace(
-         path.extname(outputPath),
-         `.${omitOptimized ? "" : "optimized."}${format || path.extname(outputPath).slice(1)}`,
-      );
-
-      // Apply the selected format to the resized image
-      if (format) {
-         await processedImage
-            // @ts-expect-error - Sharp allows strings here
-            .toFormat(format, { quality })
-            .toFile(outputFilePath);
-      } else {
-         await processedImage.toFile(outputFilePath);
-      }
-
-      // Get the final metadata after all transformations
-      const finalMetadata = await sharp(outputFilePath).metadata();
-      const finalWidth = finalMetadata.width || newWidth;
-      const finalHeight = finalMetadata.height || newHeight;
-
-      // Get optimized file size
-      const optimizedFileSizeKB =
-         (await fs.promises.stat(outputFilePath)).size / 1024;
-      overallOptimizedSize += optimizedFileSizeKB;
-
-      // Calculate the percentage change
-      const sizeDifferencePercent =
-         ((optimizedFileSizeKB - originalFileSizeKB) / originalFileSizeKB) *
-         100;
-      const sizeDifferenceLabel =
-         sizeDifferencePercent >= 0 ? "increase" : "reduction";
-
-      // Calculate estimated load time on slow 4G (1.5 Mbps = 0.1875 MB/s)
-      const slow4GSpeed = 0.1875; // MB/s
-      const originalLoadTime = originalFileSizeKB / 1024 / slow4GSpeed; // Convert KB to MB
-      const optimizedLoadTime = optimizedFileSizeKB / 1024 / slow4GSpeed; // Convert KB to MB
-
-      console.log(`Optimized image: ${imagePath}`);
-      console.log(
-         `  Resolution: ${originalResolution} -> ${finalWidth}x${finalHeight}`,
-      );
-      console.log(`  Format: ${originalFormat} -> ${format || originalFormat}`);
-      console.log(
-         `  Size: ${originalFileSizeKB.toFixed(2)} KB -> ${optimizedFileSizeKB.toFixed(2)} KB ` +
-            `(${Math.abs(sizeDifferencePercent).toFixed(2)}% ${sizeDifferenceLabel})`,
-      );
-      console.log(
-         `  Estimated load time: ${originalLoadTime.toFixed(2)}s -> ${optimizedLoadTime.toFixed(2)}s on slow 4G`,
-      );
-      console.log(`  ${blur ? `Applied blur of ${blur}px` : ""}`);
-      console.log("");
-      imagesProcessed++;
-
-      return {
-         width: finalWidth,
-         height: finalHeight,
-      };
-   } catch (error) {
-      console.error(`Error optimizing image: ${imagePath}`, error);
-      imagesFailed++;
-      return null;
    }
 }
 
@@ -295,7 +287,18 @@ function isImageFile(fileName: string): boolean {
    return imageExtensions.some((ext) => fileName.toLowerCase().endsWith(ext));
 }
 
-optimizeImages(["images/screenshots/"], {
+// Add configuration constant at the top level
+const USE_MULTITHREADING = true; // Set to false to disable multithreading
+const NUM_WORKERS = USE_MULTITHREADING ? cpus().length : 1;
+
+// Main execution
+console.log("\n=== Starting Image Optimization ===");
+console.log(
+   `Mode: ${USE_MULTITHREADING ? "Multithreading" : "Single thread"} (${NUM_WORKERS} worker${NUM_WORKERS > 1 ? "s" : ""})`,
+);
+const totalStart = Date.now();
+
+await optimizeImages(["images/screenshots/"], {
    quality: 70,
    format: "avif",
    keepAspect: true,
@@ -306,7 +309,7 @@ optimizeImages(["images/screenshots/"], {
    outputMetadata: true,
 });
 
-optimizeImages(["images/bento/"], {
+await optimizeImages(["images/bento/"], {
    quality: 70,
    width: 750,
    format: "avif",
@@ -318,7 +321,7 @@ optimizeImages(["images/bento/"], {
    omitOptimized: true,
 });
 
-optimizeImages(["images/screenshots/"], {
+await optimizeImages(["images/screenshots/"], {
    quality: 50,
    width: 750,
    format: "avif",
@@ -328,3 +331,7 @@ optimizeImages(["images/screenshots/"], {
    trimBlackBorders: true,
    trimThreshold: 10,
 });
+
+console.log(
+   `\n=== Image Optimization Complete (${((Date.now() - totalStart) / 1000).toFixed(2)}s) ===`,
+);
