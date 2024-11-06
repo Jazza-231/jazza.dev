@@ -38,7 +38,24 @@
       rdr: "Red Dead Redemption",
    };
 
-   let images: any[] = $state([]);
+   interface ImageMetadata {
+      path: string;
+      alt?: string;
+      width: number;
+      height: number;
+      nsfw?: "gore" | "nudity";
+      game?: string;
+      first?: boolean;
+   }
+
+   interface Image {
+      path: string;
+      url: string;
+      thumbnail: string;
+      metadata: ImageMetadata;
+   }
+
+   let images: Image[] = $state([]);
    let seen: string[] = [];
 
    imageURLs.forEach((_, index) => {
@@ -61,10 +78,10 @@
          },
       };
 
-      images.push(image);
+      images.push(image as Image);
    });
 
-   let dialog: HTMLDialogElement;
+   let dialog: HTMLDialogElement = $state()!;
    let loader1: HTMLImageElement;
    let loader2: HTMLImageElement;
    let containers: HTMLDivElement[] = $state([]);
@@ -73,7 +90,7 @@
    let games = imageURLs.length;
    // svelte-ignore non_reactive_update
    let ro: ResizeObserver;
-   $inspect(columns);
+   $inspect(selected);
 
    if (browser) {
       ro = new ResizeObserver((entries) => {
@@ -121,6 +138,14 @@
       }
    }
 
+   function openDialog(index: number) {
+      selected = index;
+      dialog.showModal();
+      isDialogOpen = true;
+      loader1.src = images[index + 1]?.url || "";
+      loader2.src = images[index - 1]?.url || "";
+   }
+
    function imageClick(e: MouseEvent, index: number) {
       const nsfwStatus = images[index].metadata.nsfw;
 
@@ -149,12 +174,15 @@
             }),
          );
       } else {
-         selected = index;
-         dialog.showModal();
-         loader1.src = images[index + 1]?.url || "";
-         loader2.src = images[index - 1]?.url || "";
+         openDialog(index);
       }
    }
+
+   let isDialogOpen = $state(false);
+
+   $effect(() => {
+      document.body.style.overflow = isDialogOpen ? "hidden" : "auto";
+   });
 </script>
 
 <!-- svelte-ignore a11y_missing_attribute -->
@@ -191,12 +219,14 @@
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
          class="image-container"
          tabindex={0}
          bind:this={containers[index]}
          onfocus={() => {
             loader1.src = image.url;
+            // This overrides the selected set on modal close, pls fix
             selected = index;
          }}
       >
@@ -230,9 +260,15 @@
    }}
    onclose={() => {
       containers[selected].focus();
+      isDialogOpen = false;
    }}
 >
-   <img src={images[selected].url} alt={images[selected].metadata.alt} />
+   <img
+      src={images[selected].url}
+      alt={images[selected].metadata.alt}
+      width={images[selected].metadata.width}
+      height={images[selected].metadata.height}
+   />
 </dialog>
 
 <style>
