@@ -1,11 +1,19 @@
 <script lang="ts">
-   const imageURLs: string[] = Object.values(
+   import imageMetaData from "$lib/images/screenshots/screenshots-metadata.json";
+   import moreMetaData from "./more-data.json";
+   import { browser } from "$app/environment";
+   import { stopPropagation } from "svelte/legacy";
+
+   const imageURLs = Object.entries(
       import.meta.glob("$lib/images/screenshots/**/*.avif", {
          eager: true,
          query: "?url",
          import: "default",
       }),
-   );
+   ).map(([key, value]) => ({
+      original: key,
+      vite: value,
+   }));
 
    const thumbnailURLs = Object.values(
       import.meta.glob("$lib/images/thumbnails/**/*.avif", {
@@ -15,43 +23,189 @@
       }),
    );
 
-   import imageMetaData from "$lib/images/screenshots/screenshots-metadata.json";
-   import moreMetaData from "./more-data.json";
+   // Create a flat array of all metadata entries with their game info
+   const allMetadata = Object.entries(imageMetaData).flatMap(
+      ([game, entries]) =>
+         entries.map((entry) => ({
+            ...entry,
+            game,
+         })),
+   );
+
+   const gameToName = {
+      cyberpunk: "Cyberpunk 2077",
+      forza: "Forza Horizon 5",
+      rdr2: "Red Dead Redemption 2",
+      rdr: "Red Dead Redemption",
+   };
 
    let images: any[] = [];
-   const regex = /\/src\/lib\/images\/screenshots\/([^\/]+)\//;
+   let seen: string[] = [];
 
    imageURLs.forEach((_, index) => {
-      const game = imageURLs[index].match(regex)?.[1] || "default";
+      const path = imageURLs[index].original;
+      const metadata = allMetadata.find((meta) => meta.path === path);
+      let saw;
+      if (!seen.includes(metadata!.game)) {
+         saw = true;
+         seen.push(metadata!.game);
+      }
 
-      images.push({
-         url: imageURLs[index],
+      const image = {
+         path,
+         url: imageURLs[index].vite,
          thumbnail: thumbnailURLs[index],
          metadata: {
-            ...imageMetaData[game as keyof typeof imageMetaData][index],
-            ...moreMetaData[game as keyof typeof moreMetaData]?.[index],
+            ...metadata,
+            ...moreMetaData[index],
+            first: saw,
          },
-      });
+      };
+
+      images.push(image);
    });
 
-   console.log(images);
+   let dialog: HTMLDialogElement;
+   let loader1: HTMLImageElement;
+   let loader2: HTMLImageElement;
+   let containers: HTMLDivElement[] = $state([]);
+   let selected: number = $state(0);
+   let columns = $state(1);
+   let games = imageURLs.length;
+   // svelte-ignore non_reactive_update
+   let ro: ResizeObserver;
+   $inspect(columns);
+
+   if (browser) {
+      ro = new ResizeObserver((entries) => {
+         const entry = entries[0];
+         columns = getComputedStyle(entry.target)
+            .getPropertyValue("grid-template-columns")
+            .split(" ").length;
+      });
+
+      document.addEventListener("keydown", (e) => {
+         if (
+            e.key === "Enter" &&
+            containers.includes(e.target as HTMLDivElement)
+         ) {
+            dialog.showModal();
+         }
+
+         if (e.key.includes("Arrow")) {
+            e.preventDefault();
+         } else return;
+
+         if (e.key === "ArrowLeft") {
+            selected = (selected - 1 + games) % games;
+         } else if (e.key === "ArrowRight") {
+            selected = (selected + 1) % games;
+         } else if (!dialog.open) {
+            if (e.key === "ArrowUp") {
+               selected = (selected - columns + games) % games;
+            } else if (e.key === "ArrowDown") {
+               selected = (selected + columns) % games;
+            }
+         }
+
+         loader1.src = images[(selected + 1) % games].url;
+         loader2.src = images[(selected - 1 + games) % games].url;
+
+         containers[selected].focus();
+         containers[selected].scrollIntoView({ block: "start" });
+      });
+   }
+
+   function scrollTo(node: HTMLElement) {
+      if (location.hash === `#${node.id}`) {
+         node.scrollIntoView();
+      }
+   }
 </script>
+
+<!-- svelte-ignore a11y_missing_attribute -->
+<img hidden bind:this={loader1} />
+<!-- svelte-ignore a11y_missing_attribute -->
+<img hidden bind:this={loader2} />
 
 <h1>Screenshots</h1>
 <h3>SPOILERS!!!</h3>
 
-<div class="grid">
+<ul>
    {#each images as image}
-      <img
-         src={image.thumbnail}
-         alt={image.metadata.alt}
-         width={image.metadata.width}
-         height={image.metadata.height}
-      />
+      {#if image.metadata.first}
+         <li>
+            <a
+               href="#{image.metadata.game}"
+               onfocus={(e: FocusEvent) => {
+                  const target = e.target as HTMLAnchorElement;
+                  target.scrollIntoView();
+               }}
+               onmousedown={(e) => {
+                  e.preventDefault();
+               }}
+               >{gameToName[image.metadata.game as keyof typeof gameToName]}</a
+            >
+         </li>
+      {/if}
+   {/each}
+</ul>
+
+<div class="grid" use:ro.observe>
+   {#each images as image, index}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <div
+         class="image-container"
+         tabindex={0}
+         bind:this={containers[index]}
+         onfocus={() => {
+            loader1.src = image.url;
+            selected = index;
+         }}
+      >
+         <img
+            src={image.thumbnail}
+            alt={image.metadata.alt}
+            width={image.metadata.width}
+            height={image.metadata.height}
+            data-nsfw={image.metadata.nsfw}
+            id={image.metadata.first ? image.metadata.game : undefined}
+            class:blur={image.metadata.nsfw}
+            onclick={(e: MouseEvent) => {
+               selected = index;
+               dialog.showModal();
+               loader1.src = images[index + 1].url;
+               loader2.src = images[index - 1].url;
+            }}
+            onmouseenter={() => {
+               loader1.src = image.url;
+            }}
+            use:scrollTo
+         />
+      </div>
    {/each}
 </div>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<dialog
+   bind:this={dialog}
+   onclick={() => {
+      dialog.close();
+   }}
+   onclose={() => {
+      containers[selected].focus();
+   }}
+>
+   <img src={images[selected].url} alt={images[selected].metadata.alt} />
+</dialog>
+
 <style>
+   :global(html) {
+      scroll-behavior: smooth;
+   }
    h1,
    h3 {
       text-align: center;
@@ -62,16 +216,84 @@
       }
    }
 
+   ul {
+      list-style-type: none;
+      margin-block-start: 0;
+      padding-inline-start: 0;
+      margin: 2rem;
+      line-height: 1.4rem;
+
+      a {
+         text-decoration: none;
+         scroll-margin: 10rem;
+         padding: 0.5rem;
+      }
+   }
+
    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       gap: 1rem;
+      width: 100%;
+      align-items: center;
 
-      :global(img) {
-         object-fit: cover;
-         max-width: 100%;
+      .image-container {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         padding: 0;
+         background: none;
+         height: fit-content;
+         outline: transparent 2px solid;
+         scroll-margin: 6.2rem;
+         cursor: pointer;
+         border-radius: 0.75rem;
+
+         &:focus-visible {
+            outline-color: var(--secondary);
+         }
+
+         :global(img) {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            opacity: 1;
+            transition: filter 500ms;
+            border-radius: 0.75rem;
+
+            &.blur {
+               filter: blur(1rem);
+               clip-path: inset(0 0 0 0 round 0.75rem);
+            }
+         }
+      }
+   }
+
+   dialog {
+      border: none;
+      background-color: var(--background);
+      border-radius: 1.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      display: none;
+      outline: none;
+      cursor: pointer;
+
+      &[open] {
+         display: initial;
+      }
+      &::backdrop {
+         backdrop-filter: blur(0.75rem);
+      }
+
+      img {
+         max-width: 95vw;
+         max-height: 85vh;
          height: auto;
-         align-self: center;
+         width: auto;
+         object-fit: contain;
+         border-radius: 1rem;
       }
    }
 </style>

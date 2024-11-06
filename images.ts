@@ -201,11 +201,19 @@ async function optimizeImages(
          overallOriginalSize += result.stats.originalSize;
          overallOptimizedSize += result.stats.optimizedSize;
 
-         // Update metadata
+         // Update metadata with filename
          const game =
             path
                .relative(folderPaths[0], path.dirname(imagePath))
                .split(path.sep)[0] || "default";
+
+         const baseFilename = path.basename(imagePath, path.extname(imagePath));
+         const outputFormat =
+            options.format || path.extname(imagePath).slice(1);
+         const outputFilename = options.omitOptimized
+            ? `${baseFilename}.${outputFormat}`
+            : `${baseFilename}.optimized.${outputFormat}`;
+
          if (!metadata[game]) {
             metadata[game] = [];
          }
@@ -213,7 +221,7 @@ async function optimizeImages(
             width: result.metadata.width,
             height: result.metadata.height,
             game,
-            path: path.relative(folderPaths[0], imagePath),
+            path: `/${options.outputPath}${game}/${outputFilename}`, // Updated path
          });
       } else {
          imagesFailed++;
