@@ -1,8 +1,7 @@
 <script lang="ts">
-   import imageMetaData from "$lib/images/screenshots/screenshots-metadata.json";
+   import imageMetaData from "$lib/images/screenshots/metadata.json";
    import moreMetaData from "./more-data.json";
-   import { browser } from "$app/environment";
-   import { stopPropagation } from "svelte/legacy";
+   import { browser, dev } from "$app/environment";
 
    const imageURLs = Object.entries(
       import.meta.glob("$lib/images/screenshots/**/*.avif", {
@@ -39,7 +38,7 @@
       rdr: "Red Dead Redemption",
    };
 
-   let images: any[] = [];
+   let images: any[] = $state([]);
    let seen: string[] = [];
 
    imageURLs.forEach((_, index) => {
@@ -121,6 +120,41 @@
          node.scrollIntoView();
       }
    }
+
+   function imageClick(e: MouseEvent, index: number) {
+      const nsfwStatus = images[index].metadata.nsfw;
+
+      if (e.ctrlKey && dev) {
+         e.preventDefault();
+         images[index].metadata.nsfw =
+            nsfwStatus === "gore" ? undefined : "gore";
+         if (images[index].metadata.nsfw === undefined)
+            delete images[index].metadata.nsfw;
+         console.log(
+            images.map((image) => {
+               const { nsfw, alt } = image.metadata;
+               return { nsfw, alt };
+            }),
+         );
+      } else if (e.shiftKey && dev) {
+         e.preventDefault();
+         images[index].metadata.nsfw =
+            nsfwStatus === "nudity" ? undefined : "nudity";
+         if (images[index].metadata.nsfw === undefined)
+            delete images[index].metadata.nsfw;
+         console.log(
+            images.map((image) => {
+               const { nsfw, alt } = image.metadata;
+               return { nsfw, alt };
+            }),
+         );
+      } else {
+         selected = index;
+         dialog.showModal();
+         loader1.src = images[index + 1]?.url || "";
+         loader2.src = images[index - 1]?.url || "";
+      }
+   }
 </script>
 
 <!-- svelte-ignore a11y_missing_attribute -->
@@ -136,6 +170,7 @@
       {#if image.metadata.first}
          <li>
             <a
+               class="internal-link"
                href="#{image.metadata.game}"
                onfocus={(e: FocusEvent) => {
                   const target = e.target as HTMLAnchorElement;
@@ -166,6 +201,7 @@
          }}
       >
          <img
+            loading="lazy"
             src={image.thumbnail}
             alt={image.metadata.alt}
             width={image.metadata.width}
@@ -173,11 +209,8 @@
             data-nsfw={image.metadata.nsfw}
             id={image.metadata.first ? image.metadata.game : undefined}
             class:blur={image.metadata.nsfw}
-            onclick={(e: MouseEvent) => {
-               selected = index;
-               dialog.showModal();
-               loader1.src = images[index + 1].url;
-               loader2.src = images[index - 1].url;
+            onclick={(e) => {
+               imageClick(e, index);
             }}
             onmouseenter={() => {
                loader1.src = image.url;
@@ -223,10 +256,13 @@
       margin: 2rem;
       line-height: 1.4rem;
 
-      a {
-         text-decoration: none;
-         scroll-margin: 10rem;
-         padding: 0.5rem;
+      li {
+         margin-top: 0.5rem;
+
+         a {
+            scroll-margin: 10rem;
+            padding: 0.2rem;
+         }
       }
    }
 

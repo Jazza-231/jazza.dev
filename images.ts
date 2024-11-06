@@ -230,7 +230,7 @@ async function optimizeImages(
 
    // Save metadata
    if (options.outputMetadata) {
-      const metadataPath = path.join(outputDir, "screenshots-metadata.json");
+      const metadataPath = path.join(outputDir, "metadata.json");
       await fs.promises.writeFile(
          metadataPath,
          JSON.stringify(metadata, null, 2),
@@ -327,6 +327,7 @@ await optimizeImages(["images/bento/"], {
    trimBlackBorders: true,
    trimThreshold: 10,
    omitOptimized: true,
+   outputMetadata: true,
 });
 
 await optimizeImages(["images/screenshots/"], {

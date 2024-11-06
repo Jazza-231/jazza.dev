@@ -3,7 +3,6 @@
 
    import "./vars.css";
    import "./global.css";
-   import "@fontsource-variable/inter";
    import Header from "./Header.svelte";
    import Footer from "./Footer.svelte";
    import { page } from "$app/stores";
