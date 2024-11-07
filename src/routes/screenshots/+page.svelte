@@ -110,6 +110,8 @@
 
          if (e.key.includes("Arrow")) {
             e.preventDefault();
+
+            if (dialog.open) keysPressedSinceModalOpened = true
          } else return;
 
          if (e.key === "ArrowLeft") {
@@ -183,6 +185,9 @@
    $effect(() => {
       document.body.style.overflow = isDialogOpen ? "hidden" : "auto";
    });
+
+   let keysPressedSinceModalOpened = $state(false)
+
 </script>
 
 <!-- svelte-ignore a11y_missing_attribute -->
@@ -226,8 +231,7 @@
          bind:this={containers[index]}
          onfocus={() => {
             loader1.src = image.url;
-            // This overrides the selected set on modal close, pls fix
-            selected = index;
+            if (!keysPressedSinceModalOpened) selected = index;
          }}
       >
          <img
@@ -261,6 +265,8 @@
    onclose={() => {
       containers[selected].focus();
       isDialogOpen = false;
+      keysPressedSinceModalOpened = false
+      
    }}
 >
    <img
