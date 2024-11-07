@@ -12,7 +12,8 @@
       "lint": "prettier --check . && eslint .",
       "format": "prettier --write .",
       "test:integration": "playwright test",
-      "test:unit": "vitest"
+      "test:unit": "vitest",
+      "images": "tsx images.ts"
    },
    "devDependencies": {
       "@playwright/test": "^1.48.1",
@@ -27,6 +28,7 @@
       "globals": "^15.11.0",
       "prettier": "^3.3.3",
       "prettier-plugin-svelte": "^3.2.7",
+      "sharp": "^0.33.5",
       "svelte": "5.0.0",
       "svelte-check": "^4.0.5",
       "typescript": "^5.6.3",
@@ -36,9 +38,7 @@
    },
    "type": "module",
    "dependencies": {
-      "@fontsource-variable/inter": "^5.1.0",
       "@sveltejs/adapter-cloudflare": "^4.7.3",
-      "@sveltejs/enhanced-img": "^0.3.10",
       "@threlte/core": "8.0.0-next.17",
       "@threlte/extras": "9.0.0-next.26",
       "@types/color": "^3.0.6",
@@ -46,7 +46,6 @@
       "color": "^4.2.3",
       "detect-gpu": "^5.0.53",
       "gsap": "^3.12.5",
-      "sharp": "^0.33.5",
       "three": "^0.168.0"
    }
 }

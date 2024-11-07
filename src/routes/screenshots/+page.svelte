@@ -1,143 +1,96 @@
 <script lang="ts">
+   import imageMetaData from "$lib/images/screenshots/metadata.json";
+   import moreMetaData from "./more-data.json";
    import { browser, dev } from "$app/environment";
 
-   const imports = import.meta.glob(
-      "/src/lib/images/screenshots-cropped/**/*.{png,jpg}",
-      {
+   const imageURLs = Object.entries(
+      import.meta.glob("$lib/images/screenshots/**/*.avif", {
          eager: true,
-         query: "enhanced",
+         query: "?url",
          import: "default",
-      },
-   );
-
-   import nsfwDataImport from "./nsfw.json";
-   let nsfwData = $state(nsfwDataImport) as ["gore" | "nudity" | null];
-
-   $inspect(nsfwData);
-
-   type ImageObject = {
-      sources: {
-         avif: string;
-         webp: string;
-         jpeg: string;
-      };
-      img: {
-         src: string;
-         w: number;
-         h: number;
-      };
-   };
-
-   const location = /(?<=\/screenshots-cropped\/)([^/]+)/;
-   const imagesArr: ImageObject[] = Object.values(imports) as ImageObject[];
-   const imagesLocation = Object.keys(imports).map(
-      (src) => src.match(location)?.[1] || "Unknown",
-   );
-   const gameNames = [...new Set(imagesLocation)];
-
-   type ImageDataObject = ImageObject & {
-      data: {
-         nsfw: string | null;
-         game: string;
-         fullGame: string;
-      };
-   };
-
-   const images = imagesArr.map((image, index) => ({
-      ...image,
-      data: {
-         game: imagesLocation[index],
-         nsfw: nsfwData[index],
-      },
+      }),
+   ).map(([key, value]) => ({
+      original: key,
+      vite: value,
    }));
 
-   const games: Record<string, string> = {
+   const thumbnailURLs = Object.values(
+      import.meta.glob("$lib/images/thumbnails/**/*.avif", {
+         eager: true,
+         query: "?url",
+         import: "default",
+      }),
+   );
+
+   // Create a flat array of all metadata entries with their game info
+   const allMetadata = Object.entries(imageMetaData).flatMap(
+      ([game, entries]) =>
+         entries.map((entry) => ({
+            ...entry,
+            game,
+         })),
+   );
+
+   const gameToName = {
+      cyberpunk: "Cyberpunk 2077",
+      forza: "Forza Horizon 5",
       rdr2: "Red Dead Redemption 2",
       rdr: "Red Dead Redemption",
-      forza: "Forza Horizon 5",
-      cyberpunk: "Cyberpunk 2077",
    };
 
-   const imagesByGame = images.reduce(
-      (acc, image) => {
-         const game = image.data.game;
-
-         if (!acc[game]) acc[game] = [];
-
-         acc[game].push({
-            sources: image.sources,
-            img: image.img,
-            data: {
-               nsfw: image.data.nsfw,
-               game,
-               fullGame:
-                  games[game] || `${game} - also this an error, report to me`,
-            },
-         });
-
-         return acc;
-      },
-      {} as Record<string, ImageDataObject[]>,
-   );
-
-   let modalImage: HTMLImageElement;
-   let modal: HTMLDialogElement;
-   let loader: HTMLImageElement;
-   let buttons: HTMLButtonElement[] = $state([]);
-   let details: HTMLDetailsElement[] = $state([]);
-   let selectedImage = $state(0);
-   let selectedGame = $state(gameNames[0]);
-   let closingModal = false;
-   let columns = $state(3);
-   let globalSelectedImage = $derived(
-      calculateGlobalIndex(selectedGame, selectedImage),
-   );
-
-   let ro = $state() as ResizeObserver;
-
-   function getCurrentGameImagesLength(game: string): number {
-      return imagesByGame[game]?.length || 0;
+   interface ImageMetadata {
+      path: string;
+      alt?: string;
+      width: number;
+      height: number;
+      nsfw?: "gore" | "nudity";
+      game?: string;
+      first?: boolean;
    }
 
-   function getNextGameAndIndex(
-      currentGame: string,
-      currentIndex: number,
-      direction: 1 | -1,
-   ): { game: string; index: number } {
-      const gamesList = Object.keys(imagesByGame);
-      const currentGameIndex = gamesList.indexOf(currentGame);
+   interface Image {
+      path: string;
+      url: string;
+      thumbnail: string;
+      metadata: ImageMetadata;
+   }
 
-      // If going forward and we're at the last image of the current game
-      if (
-         direction === 1 &&
-         currentIndex === getCurrentGameImagesLength(currentGame) - 1
-      ) {
-         const nextGameIndex = (currentGameIndex + 1) % gamesList.length;
+   let images: Image[] = $state([]);
+   let seen: string[] = [];
 
-         return { game: gamesList[nextGameIndex], index: 0 };
+   imageURLs.forEach((_, index) => {
+      const path = imageURLs[index].original;
+      const metadata = allMetadata.find((meta) => meta.path === path);
+      let saw;
+      if (!seen.includes(metadata!.game)) {
+         saw = true;
+         seen.push(metadata!.game);
       }
 
-      // If going backward and we're at the first image of the current game
-      if (direction === -1 && currentIndex === 0) {
-         const previousGameIndex =
-            (currentGameIndex - 1 + gamesList.length) % gamesList.length;
-         const previousGame = gamesList[previousGameIndex];
-         return {
-            game: previousGame,
-            index: getCurrentGameImagesLength(previousGame) - 1,
-         };
-      }
-
-      // If we're not at a boundary, stay in the same game and just update the index
-      return {
-         game: currentGame,
-         index:
-            (currentIndex +
-               direction +
-               getCurrentGameImagesLength(currentGame)) %
-            getCurrentGameImagesLength(currentGame),
+      const image = {
+         path,
+         url: imageURLs[index].vite,
+         thumbnail: thumbnailURLs[index],
+         metadata: {
+            ...metadata,
+            ...moreMetaData[index],
+            first: saw,
+         },
       };
-   }
+
+      images.push(image as Image);
+   });
+
+   let dialog: HTMLDialogElement = $state()!;
+   let loader1: HTMLImageElement;
+   let loader2: HTMLImageElement;
+   let containers: HTMLDivElement[] = $state([]);
+   let selected: number = $state(0);
+   let columns = $state(1);
+   let games = imageURLs.length;
+   // svelte-ignore non_reactive_update
+   let ro: ResizeObserver;
+   $inspect(selected);
 
    if (browser) {
       ro = new ResizeObserver((entries) => {
@@ -148,288 +101,252 @@
       });
 
       document.addEventListener("keydown", (e) => {
-         if (e.key.includes("Arrow")) e.preventDefault();
-         else return;
-
-         if (modal && modal.open) {
-            const currentGameLength = getCurrentGameImagesLength(selectedGame);
-            if (!currentGameLength) return;
-
-            if (e.key === "ArrowLeft") {
-               const { game, index } = getNextGameAndIndex(
-                  selectedGame,
-                  selectedImage,
-                  -1,
-               );
-               selectedGame = game;
-               selectedImage = index;
-               if (index > 0 || game !== selectedGame) {
-                  loader.src =
-                     imagesByGame[game][Math.max(0, index - 1)]?.img.src;
-               }
-            } else if (e.key === "ArrowRight") {
-               const { game, index } = getNextGameAndIndex(
-                  selectedGame,
-                  selectedImage,
-                  1,
-               );
-               selectedGame = game;
-               selectedImage = index;
-               if (
-                  index < getCurrentGameImagesLength(game) - 1 ||
-                  game !== selectedGame
-               ) {
-                  loader.src =
-                     imagesByGame[game][
-                        Math.min(
-                           getCurrentGameImagesLength(game) - 1,
-                           index + 1,
-                        )
-                     ]?.img.src;
-               }
-            }
-         } else {
-            const newState = (() => {
-               switch (e.key) {
-                  case "ArrowLeft": {
-                     const { game, index } = getNextGameAndIndex(
-                        selectedGame,
-                        selectedImage,
-                        -1,
-                     );
-                     return { game, index };
-                  }
-                  case "ArrowRight": {
-                     const { game, index } = getNextGameAndIndex(
-                        selectedGame,
-                        selectedImage,
-                        1,
-                     );
-                     return { game, index };
-                  }
-                  case "ArrowUp": {
-                     const currentLength =
-                        getCurrentGameImagesLength(selectedGame);
-
-                     const newIndex =
-                        currentLength > 1
-                           ? (selectedImage - columns + currentLength) %
-                             currentLength
-                           : 1;
-
-                     if (newIndex > selectedImage) {
-                        const { game, index } = getNextGameAndIndex(
-                           selectedGame,
-                           0,
-                           -1,
-                        );
-
-                        return {
-                           game,
-                           index: getCurrentGameImagesLength(game) - 1,
-                        };
-                     }
-                     return { game: selectedGame, index: newIndex };
-                  }
-                  case "ArrowDown": {
-                     const currentLength =
-                        getCurrentGameImagesLength(selectedGame);
-
-                     const newIndex =
-                        currentLength > 1
-                           ? (selectedImage + columns) % currentLength
-                           : -1;
-                     if (newIndex < selectedImage) {
-                        const { game, index } = getNextGameAndIndex(
-                           selectedGame,
-                           currentLength - 1,
-                           1,
-                        );
-                        return { game, index: 0 };
-                     }
-                     return { game: selectedGame, index: newIndex };
-                  }
-                  default:
-                     return { game: selectedGame, index: selectedImage };
-               }
-            })();
-
-            selectedGame = newState.game;
-            selectedImage = newState.index;
-
-            const newGameIndex = gameNames.indexOf(selectedGame);
-            if (newGameIndex !== -1) {
-               if (details[newGameIndex]) details[newGameIndex].open = true;
-            }
-
-            buttons[globalSelectedImage]?.focus();
+         if (
+            e.key === "Enter" &&
+            containers.includes(e.target as HTMLDivElement)
+         ) {
+            dialog.showModal();
          }
+
+         if (e.key.includes("Arrow")) {
+            e.preventDefault();
+
+            if (dialog.open) keysPressedSinceModalOpened = true
+         } else return;
+
+         if (e.key === "ArrowLeft") {
+            selected = (selected - 1 + games) % games;
+         } else if (e.key === "ArrowRight") {
+            selected = (selected + 1) % games;
+         } else if (!dialog.open) {
+            if (e.key === "ArrowUp") {
+               selected = (selected - columns + games) % games;
+            } else if (e.key === "ArrowDown") {
+               selected = (selected + columns) % games;
+            }
+         }
+
+         loader1.src = images[(selected + 1) % games].url;
+         loader2.src = images[(selected - 1 + games) % games].url;
+
+         containers[selected].focus();
+         containers[selected].scrollIntoView({ block: "start" });
       });
    }
 
-   function handleClick(e: MouseEvent) {
-      if (e.shiftKey || e.ctrlKey) {
-         e.stopPropagation();
+   function scrollTo(node: HTMLElement) {
+      if (location.hash === `#${node.id}`) {
+         node.scrollIntoView();
       }
+   }
 
-      const globalIndex = calculateGlobalIndex(selectedGame, selectedImage);
+   function openDialog(index: number) {
+      selected = index;
+      dialog.showModal();
+      isDialogOpen = true;
+      loader1.src = images[index + 1]?.url || "";
+      loader2.src = images[index - 1]?.url || "";
+   }
 
-      if (nsfwData[globalIndex]) {
-         nsfwData[globalIndex] = null;
+   function imageClick(e: MouseEvent, index: number) {
+      const nsfwStatus = images[index].metadata.nsfw;
+
+      if (e.ctrlKey && dev) {
+         e.preventDefault();
+         images[index].metadata.nsfw =
+            nsfwStatus === "gore" ? undefined : "gore";
+         if (images[index].metadata.nsfw === undefined)
+            delete images[index].metadata.nsfw;
+         console.log(
+            images.map((image) => {
+               const { nsfw, alt } = image.metadata;
+               return { nsfw, alt };
+            }),
+         );
+      } else if (e.shiftKey && dev) {
+         e.preventDefault();
+         images[index].metadata.nsfw =
+            nsfwStatus === "nudity" ? undefined : "nudity";
+         if (images[index].metadata.nsfw === undefined)
+            delete images[index].metadata.nsfw;
+         console.log(
+            images.map((image) => {
+               const { nsfw, alt } = image.metadata;
+               return { nsfw, alt };
+            }),
+         );
       } else {
-         if (e.ctrlKey) {
-            nsfwData[globalIndex] = "gore";
-         } else if (e.shiftKey) {
-            nsfwData[globalIndex] = "nudity";
-         }
+         openDialog(index);
       }
-
-      images[globalIndex].data.nsfw = nsfwData[globalIndex];
    }
 
-   function calculateGlobalIndex(
-      selectedGame: string,
-      selectedImage: number,
-   ): number {
-      let totalImagesBefore = 0;
+   let isDialogOpen = $state(false);
 
-      for (const game of Object.keys(imagesByGame)) {
-         if (game === selectedGame) {
-            break;
-         }
-         totalImagesBefore += imagesByGame[game].length;
-      }
+   $effect(() => {
+      document.body.style.overflow = isDialogOpen ? "hidden" : "auto";
+   });
 
-      return totalImagesBefore + selectedImage;
-   }
+   let keysPressedSinceModalOpened = $state(false)
+
 </script>
 
-<svelte:head>
-   {#each images as image, index}
-      {#if image && index < 10}
-         <link rel="prerender" href={image.img.src} />
-      {/if}
-   {/each}
-</svelte:head>
-
 <!-- svelte-ignore a11y_missing_attribute -->
-<img bind:this={loader} hidden />
+<img hidden bind:this={loader1} />
+<!-- svelte-ignore a11y_missing_attribute -->
+<img hidden bind:this={loader2} />
 
 <h1>Screenshots</h1>
-<h3>SPOILERS!!</h3>
+<h3>SPOILERS!!!</h3>
 
-<div class="screenshots">
-   {#each Object.values(imagesByGame) as images, index}
+<ul>
+   {#each images as image}
+      {#if image.metadata.first}
+         <li>
+            <a
+               class="internal-link"
+               href="#{image.metadata.game}"
+               onfocus={(e: FocusEvent) => {
+                  const target = e.target as HTMLAnchorElement;
+                  target.scrollIntoView();
+               }}
+               onmousedown={(e) => {
+                  e.preventDefault();
+               }}
+               >{gameToName[image.metadata.game as keyof typeof gameToName]}</a
+            >
+         </li>
+      {/if}
+   {/each}
+</ul>
+
+<div class="grid" use:ro.observe>
+   {#each images as image, index}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-      <details
-         open={index === 0}
-         name="pain"
-         bind:this={details[index]}
-         ontoggle={() => {
-            if (details[index].open) {
-               details[index].scrollIntoView({ behavior: "smooth" });
-            }
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+         class="image-container"
+         tabindex={0}
+         bind:this={containers[index]}
+         onfocus={() => {
+            loader1.src = image.url;
+            if (!keysPressedSinceModalOpened) selected = index;
          }}
       >
-         <summary id={images[0].data.game}>
-            {images[0].data.fullGame}
-         </summary>
-         <div class="grid" use:ro.observe>
-            {#each images as image, index}
-               <button
-                  bind:this={buttons[
-                     calculateGlobalIndex(image.data.game, index)
-                  ]}
-                  aria-label="Image"
-                  class="image-container"
-                  onclick={() => {
-                     selectedGame = images[0].data.game;
-                     selectedImage = index;
-                     modal.showModal();
-                     closingModal = true;
-
-                     // Get the next image, wrapping around to next category if needed
-                     const { game: nextGame, index: nextIndex } =
-                        getNextGameAndIndex(images[0].data.game, index, 1);
-
-                     if (nextGame && imagesByGame[nextGame]?.[nextIndex]) {
-                        loader.src = imagesByGame[nextGame][nextIndex].img.src;
-                     }
-                  }}
-                  onmouseenter={() => {
-                     loader.src = image.img.src;
-                  }}
-                  onfocus={() => {
-                     if (!closingModal) {
-                        loader.src = image.img.src;
-                        selectedGame = images[0].data.game;
-                        selectedImage = index;
-                     }
-                  }}
-               >
-                  <!-- svelte-ignore a11y_click_events_have_key_events -->
-                  <!-- svelte-ignore a11y_no_static_element_interactions -->
-                  <enhanced:img
-                     src={image}
-                     alt="Game screenshot {index + 1}"
-                     class:blur={image.data.nsfw}
-                     onclick={(event) => {
-                        if (!dev) return;
-                        handleClick(event);
-                     }}
-                  />
-               </button>
-            {/each}
-         </div>
-      </details>
+         <img
+            loading="lazy"
+            src={image.thumbnail}
+            alt={image.metadata.alt}
+            width={image.metadata.width}
+            height={image.metadata.height}
+            data-nsfw={image.metadata.nsfw}
+            id={image.metadata.first ? image.metadata.game : undefined}
+            class:blur={image.metadata.nsfw}
+            onclick={(e) => {
+               imageClick(e, index);
+            }}
+            onmouseenter={() => {
+               loader1.src = image.url;
+            }}
+            use:scrollTo
+         />
+      </div>
    {/each}
 </div>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
-   aria-label="Screenshot modal"
-   bind:this={modal}
+   bind:this={dialog}
    onclick={() => {
-      modal.close();
+      dialog.close();
    }}
    onclose={() => {
-      closingModal = false;
-
-      // Find and open the correct details section for the current game
-      const currentGameIndex = gameNames.indexOf(selectedGame);
-      if (currentGameIndex !== -1) {
-         // Close all details first
-         details.forEach((detail, index) => {
-            if (detail) detail.open = index === currentGameIndex;
-         });
-
-         // Wait for the browser to process the details opening
-         setTimeout(() => {
-            buttons[globalSelectedImage]?.focus();
-         }, 0);
-      }
+      containers[selected].focus();
+      isDialogOpen = false;
+      keysPressedSinceModalOpened = false
+      
    }}
 >
    <img
-      bind:this={modalImage}
-      alt="Screenshot"
-      src={imagesByGame[selectedGame]?.[selectedImage]?.img.src}
-      width={imagesByGame[selectedGame]?.[selectedImage]?.img.w}
-      height={imagesByGame[selectedGame]?.[selectedImage]?.img.h}
+      src={images[selected].url}
+      alt={images[selected].metadata.alt}
+      width={images[selected].metadata.width}
+      height={images[selected].metadata.height}
    />
 </dialog>
 
 <style>
-   h1 {
-      text-align: center;
+   :global(html) {
+      scroll-behavior: smooth;
    }
+   h1,
    h3 {
-      font-size: 0.9rem;
       text-align: center;
-      margin-block-start: -1rem;
+
+      &:is(h3) {
+         font-size: 0.9rem;
+         margin-block-start: -1rem;
+      }
    }
+
+   ul {
+      list-style-type: none;
+      margin-block-start: 0;
+      padding-inline-start: 0;
+      margin: 2rem;
+      line-height: 1.4rem;
+
+      li {
+         margin-top: 0.5rem;
+
+         a {
+            scroll-margin: 10rem;
+            padding: 0.2rem;
+         }
+      }
+   }
+
+   .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      align-items: center;
+
+      .image-container {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         padding: 0;
+         background: none;
+         height: fit-content;
+         outline: transparent 2px solid;
+         scroll-margin: 6.2rem;
+         cursor: pointer;
+         border-radius: 0.75rem;
+
+         &:focus-visible {
+            outline-color: var(--secondary);
+         }
+
+         :global(img) {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            opacity: 1;
+            transition: filter 500ms;
+            border-radius: 0.75rem;
+
+            &.blur {
+               filter: blur(1rem);
+               clip-path: inset(0 0 0 0 round 0.75rem);
+            }
+         }
+      }
+   }
+
    dialog {
       border: none;
       background-color: var(--background);
@@ -439,6 +356,8 @@
       justify-content: center;
       display: none;
       outline: none;
+      cursor: pointer;
+
       &[open] {
          display: initial;
       }
@@ -453,74 +372,6 @@
          width: auto;
          object-fit: contain;
          border-radius: 1rem;
-      }
-   }
-   .screenshots {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem;
-      margin-block-end: 2rem;
-
-      details {
-         scroll-margin-block-start: 6rem;
-      }
-
-      summary {
-         color: var(--primary);
-         font-size: 1.6rem;
-         width: fit-content;
-         margin-block-end: 1rem;
-         outline: transparent 2px solid;
-         padding: 0.4rem;
-         border-radius: 0.75rem;
-
-         &:focus-visible {
-            outline: var(--secondary) 2px solid;
-         }
-
-         :global(svg) {
-            stroke: var(--primary);
-            scale: 1.5;
-            transition: transform 200ms;
-         }
-      }
-
-      .grid {
-         display: grid;
-         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-         gap: 1rem;
-         width: 100%;
-         align-items: center;
-
-         .image-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-            background: none;
-            height: fit-content;
-            outline: transparent 2px solid;
-
-            &:focus-visible {
-               outline-color: var(--secondary);
-            }
-
-            :global(img) {
-               width: 100%;
-               height: auto;
-               object-fit: contain;
-               opacity: 1;
-               transition: filter 500ms;
-               border-radius: 0.75rem;
-
-               &.blur {
-                  filter: blur(1rem);
-                  clip-path: inset(0 0 0 0 round 0.75rem);
-               }
-            }
-         }
       }
    }
 </style>

@@ -3,11 +3,12 @@
    import { arrowMarkerSVG } from "$lib/Icons";
    const { data } = $props();
    const { age } = data;
+   import metadata from "$lib/images/bento/metadata.json";
 
-   import ScratchAddonsImage from "$lib/images/bento/ScratchAddons.png?enhanced";
-   import MediaScoutImage from "$lib/images/bento/MediaScout.png?enhanced";
-   import WebsiteImage from "$lib/images/bento/Website.png?enhanced";
-   import LoremPicsumImage from "$lib/images/bento/LoremPicsum.jpg?enhanced";
+   import ScratchAddonsImage from "$lib/images/bento/ScratchAddons.avif";
+   import MediaScoutImage from "$lib/images/bento/MediaScout.avif";
+   import WebsiteImage from "$lib/images/bento/Website.avif";
+   import LoremPicsumImage from "$lib/images/bento/LoremPicsum.avif";
 </script>
 
 <!-- PLEASE DO REACTIVITY SOMETIME https://www.youtube.com/watch?v=x4u1yp3Msao -->
@@ -61,6 +62,7 @@
             href="/projects/scratch-addons"
             area="a"
             image={ScratchAddonsImage}
+            metadata={metadata.default[3]}
          />
          <Bento
             header="MediaScout"
@@ -69,6 +71,7 @@
             short
             area="b"
             image={MediaScoutImage}
+            metadata={metadata.default[0]}
          >
             <p>Currently private.</p>
          </Bento>
@@ -79,6 +82,7 @@
             short
             area="c"
             image={WebsiteImage}
+            metadata={metadata.default[2]}
          />
          <Bento
             header="Quickie"
@@ -86,6 +90,7 @@
             href="/projects/quickie"
             area="d"
             image={LoremPicsumImage}
+            metadata={metadata.default[1]}
          >
             <p>Currently private.</p>
          </Bento>

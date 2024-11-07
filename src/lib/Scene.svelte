@@ -1,49 +1,55 @@
 <script lang="ts">
-   // @ts-ignore
-   import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-   // @ts-ignore
-   import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
    import { T, useTask } from "@threlte/core";
    import { Text3DGeometry, Align, OrbitControls } from "@threlte/extras";
-   import * as detectGPU from "detect-gpu";
    import { Object3D } from "three";
    import Color from "color";
+   import { onMount } from "svelte";
 
-   // Setup DRACOLoader
-   const gltfLoader = new GLTFLoader();
-   const dracoLoader = new DRACOLoader();
-   dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
-   gltfLoader.setDRACOLoader(dracoLoader);
+   // Dynamically import heavy loaders
+   const initLoaders = async () => {
+      const { GLTFLoader } = await import(
+         // @ts-ignore
+         "three/examples/jsm/loaders/GLTFLoader"
+      );
+      const { DRACOLoader } = await import(
+         // @ts-ignore
+         "three/examples/jsm/loaders/DRACOLoader"
+      );
 
-   const { getGPUTier } = detectGPU;
+      const gltfLoader = new GLTFLoader();
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+      gltfLoader.setDRACOLoader(dracoLoader);
+
+      return gltfLoader;
+   };
+
    let model = $state(0);
    let colour = $state([1, 0, 0]);
    let hue = 0;
    let normalizedColour = $state([1, 0, 0]);
    let autoRotateSpeed = $state(1.5);
+   let gltfLoader: any = $state();
 
-   useTask((delta) => {
-      hue = (hue + delta * 30) % 360;
-      colour = Color({ h: hue, s: 100, l: 50 }).rgb().array();
-
-      normalizedColour = colour.map((value) => value / 255);
-
-      autoRotateSpeed = delta * 300;
-   });
-
-   (async () => {
+   onMount(async () => {
+      const { getGPUTier } = await import("detect-gpu");
       const gpuTier = await getGPUTier();
-
-      console.log(gpuTier);
 
       if (gpuTier.tier < 2) {
          model = 1;
          console.warn("Low power GPU detected, using low quality model");
-      } else model = 0;
-   })();
+      }
 
-   // svelte-ignore non_reactive_update
-   let rotate = false;
+      gltfLoader = await initLoaders();
+   });
+
+   useTask((delta) => {
+      hue = (hue + delta * 30) % 360;
+      colour = Color({ h: hue, s: 100, l: 50 }).rgb().array();
+      normalizedColour = colour.map((value) => value / 255);
+      autoRotateSpeed = delta * 300;
+   });
+
    let rotation = Math.PI / 2;
 
    const laptopEl = document.querySelector(".laptop");
@@ -54,31 +60,22 @@
       "/models/Noob laptop model.glb",
    ];
 
-   type ModelsData = {
-      scale: number;
-      position: number;
-      text1: [x: number, y: number, z: number];
-      text2: [x: number, y: number, z: number];
-      text3: [x: number, y: number, z: number];
-      text4: [x: number, y: number, z: number];
-   };
-
-   const modelsData: ModelsData[] = [
+   const modelsData = [
       {
          scale: 1,
          position: 0.4,
-         text1: [0, 2.4, -0.7],
-         text2: [1, 1.7, -0.65],
-         text3: [-0.4, 0.6, 0.8],
-         text4: [0.2, 0.6, -0.8],
+         text1: [0, 2.4, -0.7] as [number, number, number],
+         text2: [1, 1.7, -0.65] as [number, number, number],
+         text3: [-0.4, 0.6, 0.8] as [number, number, number],
+         text4: [0.2, 0.6, -0.8] as [number, number, number],
       },
       {
          scale: 7,
          position: 1.5,
-         text1: [0, 2.3, -0.5],
-         text2: [1, 1.7, -0.31],
-         text3: [-0.4, 0.75, 1],
-         text4: [0.2, 0.9, -0.2],
+         text1: [0, 2.3, -0.5] as [number, number, number],
+         text2: [1, 1.7, -0.31] as [number, number, number],
+         text3: [-0.4, 0.75, 1] as [number, number, number],
+         text4: [0.2, 0.9, -0.2] as [number, number, number],
       },
    ];
 </script>
@@ -106,38 +103,39 @@
    shadow.bias={-0.0001}
 />
 <T.DirectionalLight
-   position={[0.4, 0 - 0.5, -2]}
+   position={[0.4, -0.5, -2]}
    intensity={0.5}
    shadow.bias={-0.0001}
 />
 
-{#await gltfLoader.loadAsync(models[model]) then gltf}
-   {laptopEl?.classList.add("done")}
-   {loadingEl?.classList.add("done")}
-   {(rotate = true)}
-   {gltf.scene.traverse((object: Object3D & { material: any }) => {
-      // @ts-ignore
-      if (object.isMesh) {
-         object.castShadow = true;
-         object.receiveShadow = true;
+{#if gltfLoader}
+   {#await gltfLoader.loadAsync(models[model]) then gltf}
+      {laptopEl?.classList.add("done")}
+      {loadingEl?.classList.add("done")}
+      {gltf.scene.traverse((object: Object3D & { material: any }) => {
+         // @ts-ignore
+         if (object.isMesh) {
+            object.castShadow = true;
+            object.receiveShadow = true;
 
-         if (object.name === "Object005") {
-            object.material.emissive.set(...normalizedColour);
-            object.material.color.set(...normalizedColour);
-         }
+            if (object.name === "Object005") {
+               object.material.emissive.set(...normalizedColour);
+               object.material.color.set(...normalizedColour);
+            }
 
-         if (object.name === "Key_") {
-            object.material.emissive.set(...normalizedColour);
+            if (object.name === "Key_") {
+               object.material.emissive.set(...normalizedColour);
+            }
          }
-      }
-   })}
-   <T
-      is={gltf.scene}
-      position.y={modelsData[model].position}
-      rotation.y={rotation}
-      scale={modelsData[model].scale}
-   />
-{/await}
+      })}
+      <T
+         is={gltf.scene}
+         position.y={modelsData[model].position}
+         rotation.y={rotation}
+         scale={modelsData[model].scale}
+      />
+   {/await}
+{/if}
 
 <T.Mesh rotation.x={-Math.PI / 2} receiveShadow position.y={0.4}>
    <T.CircleGeometry args={[7, 100]} />
@@ -160,9 +158,7 @@
                      size={0.1}
                      depth={0.02}
                      font="/fonts/Inter Medium_Regular.json"
-                     oncreate={() => {
-                        align();
-                     }}
+                     oncreate={align}
                   />
                </T.Mesh>
             {/snippet}
