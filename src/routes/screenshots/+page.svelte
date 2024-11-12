@@ -111,7 +111,7 @@
          if (e.key.includes("Arrow")) {
             e.preventDefault();
 
-            if (dialog.open) keysPressedSinceModalOpened = true
+            if (dialog.open) keysPressedSinceModalOpened = true;
          } else return;
 
          if (e.key === "ArrowLeft") {
@@ -186,8 +186,7 @@
       document.body.style.overflow = isDialogOpen ? "hidden" : "auto";
    });
 
-   let keysPressedSinceModalOpened = $state(false)
-
+   let keysPressedSinceModalOpened = $state(false);
 </script>
 
 <!-- svelte-ignore a11y_missing_attribute -->
@@ -265,8 +264,7 @@
    onclose={() => {
       containers[selected].focus();
       isDialogOpen = false;
-      keysPressedSinceModalOpened = false
-      
+      keysPressedSinceModalOpened = false;
    }}
 >
    <img
