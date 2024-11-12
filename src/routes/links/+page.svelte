@@ -59,8 +59,9 @@
                data[index].x = e.clientX - window.window.innerWidth / 2;
                data[index].y = e.clientY - window.window.innerHeight / 2;
             }
-         }}>{text}</a
-      >
+         }}
+         >{text}
+      </a>
    {/each}
 </div>
 
@@ -80,11 +81,17 @@
          text-decoration: none;
          font-size: 1.25rem;
          transform: scale(var(--scale, 1));
-         transition: transform 200ms;
+         transition:
+            transform 200ms,
+            text-shadow 200ms;
          height: fit-content;
+         text-shadow: var(--primary) 0px 0px 2rem;
 
          &:hover {
             transform: scale(calc(var(--scale, 1) + 0.2));
+            text-shadow:
+               var(--primary) 0px 0px 2rem,
+               var(--primary) 0px 0px 2rem;
          }
       }
    }

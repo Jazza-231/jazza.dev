@@ -336,6 +336,7 @@
             opacity: 1;
             transition: filter 500ms;
             border-radius: 0.75rem;
+            scroll-margin: 10rem;
 
             &.blur {
                filter: blur(1rem);
