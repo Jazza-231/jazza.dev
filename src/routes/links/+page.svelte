@@ -36,7 +36,7 @@
 
       // Generate random offsets using seeded random numbers (±25px)
       const offsetX = rand2 * 50 - 25;
-      const offsetY = rand3 * 50 - 25;
+      const offsetY = rand3 * 50 - 100;
 
       return {
          x: Math.cos(angle) * radius + offsetX,
