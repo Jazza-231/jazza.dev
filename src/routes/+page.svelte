@@ -1,6 +1,6 @@
 <script lang="ts">
-   import Bento from "$lib/Bento.svelte";
-   import { arrowMarkerSVG } from "$lib/Icons";
+   import Bento from "$lib/components/Bento.svelte";
+   import { arrowMarkerSVG } from "$lib/components/Icons.js";
    const { data } = $props();
    const { age } = data;
    import metadata from "$lib/images/bento/metadata.json";
@@ -134,12 +134,18 @@
             "My absolute favourite food is Spaghetti Bolognese, with a special spice mix of my own creation",
             "My favourite pasta to go with it is Barilla Linguine N.13",
             "Also recently I've found a love for salmon, and I've gotten quite good at cooking it",
+            "Update: I ate too much salmon and now I don't like it LMAOOO",
          ])}
          {@render indented("Other things I like!", [
             "Photography",
             "Friends",
-            "Movies (Classics like Inception to new hits like Deadpool And Wolverine)",
+            "Movies (Classics like Inception - no, classics does not mean old - to new hits like Deadpool And Wolverine)",
             "Reading (I LOVE YOU BRANDON SANDERSON)",
+         ])}
+         {@render indented("Tech", [
+            "I love svelte. See the footer for a list of technologies used on this site!",
+            "Svelte 5 is amazing, no matter what people say",
+            "Also I was just moving some files around, I am so grateful for auto-changing imports lol",
          ])}
       </div>
    </div>

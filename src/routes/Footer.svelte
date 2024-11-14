@@ -13,7 +13,7 @@
       ThreeDev,
       DeviconDev,
       BlenderDev,
-   } from "$lib/Icons";
+   } from "$lib/components/Icons";
    const Icons = {
       CloudflareDev,
       GithubDev,

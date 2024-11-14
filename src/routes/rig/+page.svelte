@@ -1,5 +1,5 @@
 <script lang="ts">
-   import NewLaptop from "$lib/NewLaptop.svelte";
+   import NewLaptop from "$lib/components/NewLaptop.svelte";
 </script>
 
 <div class="title">
