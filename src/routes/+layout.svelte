@@ -13,7 +13,7 @@
       [name, $page.url.pathname.split("/")[1]].filter(Boolean).join(" - "),
    );
 
-   const widerPaths = "/screenshots";
+   const widerPaths = ["/screenshots", "/example"];
 </script>
 
 <svelte:head>
@@ -22,7 +22,7 @@
 
 <Header></Header>
 
-<main class:wide={$page.url.pathname.match(widerPaths)}>
+<main class:wide={widerPaths.includes($page.url.pathname)}>
    {@render children()}
 </main>
 
