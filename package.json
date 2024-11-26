@@ -19,9 +19,6 @@
       "@playwright/test": "^1.49.0",
       "@sveltejs/kit": "^2.8.3",
       "@sveltejs/vite-plugin-svelte": "4.0.1",
-      "@types/eslint": "^9.6.1",
-      "@types/node": "^22.9.0",
-      "@types/three": "^0.170.0",
       "eslint": "^9.15.0",
       "eslint-config-prettier": "^9.1.0",
       "eslint-plugin-svelte": "^2.46.0",
@@ -46,7 +43,10 @@
       "color": "^4.2.3",
       "detect-gpu": "^5.0.57",
       "gsap": "^3.12.5",
-      "three": "^0.170.0"
+      "three": "^0.170.0",
+      "@types/three": "^0.170.0",
+      "@types/eslint": "^9.6.1",
+      "@types/node": "^22.9.0"
    },
    "pnpm": {
       "overrides": {
