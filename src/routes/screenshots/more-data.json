@@ -1,18 +1,33 @@
 {
    "20240525142456_1": {
-      "nsfw": "gore"
+      "nsfw": "gore",
+      "alt": "Bloodied battlefield scene with two lifeless bodies and the player preparing for action in a hostile area, holding a gun."
    },
-   "20240525144846_1": {},
-   "20240525145034_1": {},
+   "20240525144846_1": {
+      "alt": "A character rides a motorcycle down a rain-soaked road at night, with a van approaching in the incoming lane."
+   },
+   "20240525145034_1": {
+      "alt": "A character rides a motorcycle on a rain-soaked road at night."
+   },
    "20240525182425_1": {
-      "nsfw": "gore"
+      "nsfw": "gore",
+      "alt": "Two bloodied, lifeless bodies lie on the ground as a person aims and fires a gun at them."
    },
-   "20240525183505_1": {},
-   "20240525185011_1": {},
-   "20240525185021_1": {},
-   "20240525185041_1": {},
+   "20240525183505_1": {
+      "alt": "A scan of a bottle of questionable whiskey sitting on a table in a dimly lit room"
+   },
+   "20240525185011_1": {
+      "alt": "A cybernetic hand reaches out under glowing lanterns, set against a vibrant cityscape at night."
+   },
+   "20240525185021_1": {
+      "alt": "Two glowing, holographic koi fish move among illuminated lanterns, lighting up the busy streets of a futuristic city."
+   },
+   "20240525185041_1": {
+      "alt": "Multiple glowing, holographic koi fish float through the air among illuminated lanterns, lighting up the busy streets of a futuristic city."
+   },
    "20240528005627_1": {
-      "nsfw": "gore"
+      "nsfw": "gore",
+      "alt": "A headless character with a detached leg lies on the ground, with two pistols beside him."
    },
    "20240528015213_1": {
       "nsfw": "gore"
@@ -26,10 +41,18 @@
    "20240601204645_1": {},
    "20240601210523_1": {},
    "20240601210531_1": {},
-   "20240601211037_1": {},
-   "20240601211121_1": {},
-   "20240601211204_1": {},
-   "20240601211300_1": {},
+   "20240601211037_1": {
+      "alt": "A blue glowing pyramid emits a vertical yellow light beam in a dark, digital setting."
+   },
+   "20240601211121_1": {
+      "alt": "A blue-glowning pyramid emits a vertical yellow light beam in the middle of a dark, digital setting, with a character standing inside the beam."
+   },
+   "20240601211204_1": {
+      "alt": "A character wearing a vest stands beside a yellow vertical beam in a dark setting, with a dialogue about betrayal at the bottom of the screen."
+   },
+   "20240601211300_1": {
+      "alt": "A character sitting with one leg on the table, holding an object, in a dark setting with a yellow beam of light in the background."
+   },
    "20240601211510_1": {},
    "20240601214235_1": {},
    "20240601214239_1": {},
@@ -88,7 +111,9 @@
    },
    "20240618212350_1": {},
    "20240618213042_1": {},
-   "20240618214440_1": {},
+   "20240618214440_1": {
+      "alt": ".A car on a lift at a repair station with automated laser systems performing multiple repairs."
+   },
    "20240612225508_1": {},
    "20240614164821_1": {},
    "20240614175101_1": {},
@@ -99,9 +124,15 @@
    "20240624170910_1": {},
    "20240624174122_1": {},
    "20240624175314_1": {},
-   "20240630191144_1": {},
-   "20240630191355_1": {},
-   "20240630191637_1": {},
+   "20240630191144_1": {
+      "alt": "At sunset, a rally car races down a wet road, its headlights flashing brightly."
+   },
+   "20240630191355_1": {
+      "alt": " A rally car speeds along a wet road at night, headlights and taillights glowing in the dimly lit surroundings."
+   },
+   "20240630191637_1": {
+      "alt": "A bell hangs from a pole as sunlight streams through the trees in a misty, swampy forest."
+   },
    "20240630193610_1": {},
    "20240701191145_1": {},
    "20240701191316_1": {},
@@ -129,6 +160,10 @@
    "20240802223842_1": {},
    "20240809211536_1": {},
    "20240811220921_1": {},
+   "20241123200805_1": {},
+   "20241123201318_1": {},
+   "20241123204753_1": {},
+   "20241123205137_1": {},
    "20241030152422_1": {},
    "20241030170347_1": {},
    "20240709142211_1": {
@@ -177,83 +212,204 @@
    "20240718225701_1": {},
    "20240718225728_1": {},
    "20240718230125_1": {},
-   "20240718230256_1": {},
-   "20240719152409_1": {},
-   "20240719154033_1": {},
-   "20240719162132_1": {},
-   "20240720154058_1": {},
-   "20240720161216_1": {},
-   "20240720162054_1": {},
-   "20240720172747_1": {},
+   "20240718230256_1": {
+      "alt": "Meadow with wildflowers and greenery, adjacent to a pond. Clear blue sky above, surrounded by trees and chirping birds."
+   },
+   "20240719152409_1": {
+      "alt": "A man in a leather coat holds a lantern on a sandy riverside at night, with a figure mid-air and a starry sky above the trees."
+   },
+   "20240719154033_1": {
+      "alt": "Two male characters stand on a dock in the rain, overlooking a lake with a rainbow."
+   },
+   "20240719162132_1": {
+      "alt": "A male character with a rifle sits on a horse, gazing at the night sky filled with stars above a forest."
+   },
+   "20240720154058_1": {
+      "alt": "Two male characters, one with long hair and the other wearing a cowboy hat, sit on a vehicle in front of the Bank of Rhodes during the daytime."
+   },
+   "20240720161216_1": {
+      "alt": "A rider on horseback moves through a forest as sunlight streams through the trees."
+   },
+   "20240720162054_1": {
+      "alt": "A male character points a rifle toward another character in a tense standoff in a forest at night."
+   },
+   "20240720172747_1": {
+      "alt": "A male character with long hair stands before a fiery blaze in a dim underground tunnel."
+   },
    "20240820221753_1": {},
    "20240820223033_1": {},
    "20240820223119_1": {},
    "20240820223542_1": {},
-   "20240820224138_1": {},
-   "20240820224303_1": {},
-   "20240820224657_1": {},
-   "20240820225058_1": {},
-   "20240823232630_1": {},
-   "20240823234109_1": {},
-   "20240823235905_1": {},
-   "20240827164745_1": {},
-   "20240827183135_1": {},
-   "20240902175457_1": {},
-   "20240902191727_1": {},
-   "20240902205041_1": {},
-   "20240902205244_1": {},
+   "20240820224138_1": {
+      "alt": "A male character with long hair and a beard holds a cigarette in his mouth and a match with fire in his hand."
+   },
+   "20240820224303_1": {
+      "alt": "A male character with long hair and a beard smokes a cigarette while standing in a forest at night."
+   },
+   "20240820224657_1": {
+      "alt": "A male character fires a revolver, the muzzle flash illuminating the darkness around him."
+   },
+   "20240820225058_1": {
+      "alt": "A male character fires a revolver upward at night, the muzzle flash illuminating his figure and the surrounding forest."
+   },
+   "20240823232630_1": {
+      "alt": "A male character stands by a calm river with a rifle, a horse nearby, and hills in the background."
+   },
+   "20240823234109_1": {
+      "alt": "A male character on horseback holding a lantern amidst falling snow in a dark forest on a snowy night."
+   },
+   "20240823235905_1": {
+      "alt": "A male character firing a mounted machine gun inside a rustic barn, with sunlight streaming through the wooden walls."
+   },
+   "20240827164745_1": {
+      "alt": "A male character wearing a raccoon hat and bandolier, standing in a sunlit forest."
+   },
+   "20240827183135_1": {
+      "alt": "A male character and a female character in period clothing, one wearing a hat and the other with a bandolier, are seated on a horse-drawn carriage."
+   },
+   "20240902175457_1": {
+      "alt": "A male character in fox headgear holds two revolvers inside a dark room."
+   },
+   "20240902191727_1": {
+      "alt": "A male character in a rugged leather coat paddles a wooden canoe across a calm, forest-lined river under a dim, cloudy sky."
+   },
+   "20240902205041_1": {
+      "alt": "A character with long hair and a beard leans against a stone wall, sunlight filtering through a nearby metal railing, with ferns sprouting from the cracks."
+   },
+   "20240902205244_1": {
+      "alt": "A bald man with a beard stands by a stone wall. Sunlight shines through a metal railing above, and ferns grow from cracks in the wall."
+   },
    "20240902210007_1": {
-      "nsfw": "nudity"
+      "nsfw": "nudity",
+      "alt": "A character holds a white paper with a drawing of a nude female character above a railway track, with a map displayed in the bottom left corner."
    },
-   "20240902213912_1": {},
-   "20240909201146_1": {},
-   "20240909204044_1": {},
-   "20240909211520_1": {},
-   "20240909211754_1": {},
-   "20240909212143_1": {},
-   "20240909213822_1": {},
-   "20240909213905_1": {},
-   "20240909214347_1": {},
+   "20240902213912_1": {
+      "alt": "A bearded man drinks by firelight near an old house, surrounded by supplies and dark trees at night."
+   },
+   "20240909201146_1": {
+      "alt": "A bell hangs from a pole as sunlight streams through the trees in a misty, swampy forest."
+   },
+   "20240909204044_1": {
+      "alt": "A dimly lit mansion foyer with twin staircases, marble columns, and a central chandelier."
+   },
+   "20240909211520_1": {
+      "alt": "A rugged, bearded character in a coat sits beside a female character in a checkered dress."
+   },
+   "20240909211754_1": {
+      "alt": "A rugged, bearded character in a coat sits in front, while a female character in a checkered dress sits behind him on a street in front of a building."
+   },
+   "20240909212143_1": {
+      "alt": "A male character places his hands on a brick wall, standing in front of a female character at the corner of a building."
+   },
+   "20240909213822_1": {
+      "alt": "A male character with a beard wearing a jacket and a female character in a checkered dress sit side by side on chairs in a dark room."
+   },
+   "20240909213905_1": {
+      "alt": "In a dark room, a female performer performs with fire on stage while the audience watches, sitting in their chairs."
+   },
+   "20240909214347_1": {
+      "alt": "In a dark room, four female performers and a male performer perform on stage while the audience watches, sitting in their chairs."
+   },
    "20240909221646_1": {
-      "nsfw": "gore"
+      "nsfw": "gore",
+      "alt": "In a dimly lit room, an injured dead body lies on a bed."
    },
-   "20240909223613_1": {},
-   "20240909224019_1": {},
-   "20240909233514_1": {},
-   "20240909234007_1": {},
-   "20240909234138_1": {},
-   "20240910002304_1": {},
-   "20240910002929_1": {},
-   "20240910003028_1": {},
+   "20240909223613_1": {
+      "alt": "A man in a weathered coat and cowboy hat, with a bandolier, kneels on the grassy surface, touching a dog's neck."
+   },
+   "20240909224019_1": {
+      "alt": "A character in a hat and blue coat stands in a dark room, releasing smoke from his mouth."
+   },
+   "20240909233514_1": {
+      "alt": "A character with a beard and long hair, wearing a gray coat, stands on a street with sunlight falling on him, carrying a pistol in a belt holster."
+   },
+   "20240909234007_1": {
+      "alt": "A character with a neutral expression, wearing a black suit and red tie, stands inside a dimly lit room with walls adorned with posters."
+   },
+   "20240909234138_1": {
+      "alt": "A horse-drawn carriage with well-dressed passengers moves along a dirt street with tram tracks, surrounded by worn buildings and scattered pedestrians."
+   },
+   "20240910002304_1": {
+      "alt": "A character fires a mounted machine gun at night, flames bursting from the barrel."
+   },
+   "20240910002929_1": {
+      "alt": "A lightning bolt cuts through dense clouds in the dark night sky, striking the ground with a bright impact."
+   },
+   "20240910003028_1": {
+      "alt": "A rider on horseback pauses by a lake under a stormy sky, with lightning striking in the distance."
+   },
    "20240910005000_1": {
-      "nsfw": "gore"
+      "nsfw": "gore",
+      "alt": "A skeleton lies on muddy ground with rough patches, its neck restrained by a metal object, in an open area with light shining from above."
    },
-   "20240910005837_1": {},
-   "20240910012111_1": {},
-   "20240910012123_1": {},
-   "20240910012145_1": {},
-   "20240910012609_1": {},
+   "20240910005837_1": {
+      "alt": "A weathered boat sits atop a broken tree trunk by a calm river, surrounded by lush greenery in daylight."
+   },
+   "20240910012111_1": {
+      "alt": "A character wearing a white shirt, brown vest, glasses, and hand gloves on the left hand, looking left with mouth open."
+   },
+   "20240910012123_1": {
+      "alt": "A character in black attire sits on a wooden chair, their wrists secured with restraints, while another character operates a machine in a foggy outdoor setting."
+   },
+   "20240910012145_1": {
+      "alt": "A character sits on a wooden chair, their body marked with visible wounds and wrists secured with restraints."
+   },
+   "20240910012609_1": {
+      "alt": "At night, a character stands in front of a building on a dimly lit street, with a wet road."
+   },
    "20240911001002_1": {
-      "nsfw": "gore"
+      "nsfw": "gore",
+      "alt": "Two dead bodies of characters lie on the grassy surface, one headless, positioned beside a campfire."
    },
-   "20240911002648_1": {},
-   "20240911002713_1": {},
+   "20240911002648_1": {
+      "alt": "An oil rig is consumed by flames, with smoke billowing into the night sky. A hill looms in the distance."
+   },
+   "20240911002713_1": {
+      "alt": "An oil rig burns in the night."
+   },
    "20240911003758_1": {
-      "nsfw": "gore"
+      "nsfw": "gore",
+      "alt": "A headless character sits on a horse, holding their head in their hands, in a forest."
    },
-   "20240911004530_1": {},
-   "20240911004857_1": {},
-   "20240911005056_1": {},
-   "20240911005418_1": {},
-   "20240911010854_1": {},
-   "20240911011120_1": {},
-   "20240911011359_1": {},
-   "20240911013528_1": {},
-   "20240911024459_1": {},
-   "20240911024510_1": {},
-   "20240911024522_1": {},
-   "20240911025030_1": {},
-   "20240911025233_1": {},
+   "20240911004530_1": {
+      "alt": "A dimly lit, foggy forest with shallow water, where dead bodies lie scattered on the surface."
+   },
+   "20240911004857_1": {
+      "alt": "A daytime view of a serene swamp scene with a dead fish on the shore, a railroad bridge in the distance, and an oil slick marring the water's surface."
+   },
+   "20240911005056_1": {
+      "alt": "A character with long hair and red lips sits on the street, holding a hand fan."
+   },
+   "20240911005418_1": {
+      "alt": "A character in floral-patterned attire with dramatic makeup."
+   },
+   "20240911010854_1": {
+      "alt": "An engraved silver pistol with a scrollwork design."
+   },
+   "20240911011120_1": {
+      "alt": "A hand grasps an ornate revolver adorned with intricate floral engravings."
+   },
+   "20240911011359_1": {
+      "alt": "A hand grasps an ornate revolver adorned with intricate floral engravings."
+   },
+   "20240911013528_1": {
+      "alt": "A man in a hat stands near a campfire at night, with chairs and a bucket nearby in a foggy forest."
+   },
+   "20240911024459_1": {
+      "alt": "A group of people walks along a sandy beach near clear blue water, surrounded by lush greenery and rocky terrain."
+   },
+   "20240911024510_1": {
+      "alt": "Coastal landscape with green hills and a blue ocean under a clear sky."
+   },
+   "20240911024522_1": {
+      "alt": "A glimpse of a serene beach through lush tropical vegetation."
+   },
+   "20240911025030_1": {
+      "alt": "five individuals traverse a sunlit forest, surrounded by tall grass, vibrant greenery, and red flowers, with the leader carrying a rifle."
+   },
+   "20240911025233_1": {
+      "alt": "A black wolf with glowing eyes stands in a misty forest at night."
+   },
    "20240911025542_1": {},
    "20241001215445_1": {},
    "20241001215629_1": {},
@@ -517,5 +673,23 @@
    "20241028195023_1": {},
    "20241028195754_1": {},
    "Screenshot (154)": {},
-   "Screenshot (155)": {}
+   "Screenshot (155)": {},
+   "20241204224644_1": {
+      "alt": "Two characters riding a ferry on a lake in a snowy forrest"
+   },
+   "20241204224727_1": {
+      "alt": "Two characters facing away from the camera, riding a ferry on a lake in a snowy forrest"
+   },
+   "20241204224946_1": {
+      "alt": "Wide shot of a snowy forrest, sunlight reflecting off a lake"
+   },
+   "20241204225000_1": {
+      "alt": "Close up shot of a female character on a lake in a snowy forrest"
+   },
+   "20241204233331_1": {
+      "alt": "Female character holding a book titled \"Raising your transgender child\""
+   },
+   "20241204233658_1": {
+      "alt": "Two young children holding hands, sitting on a bunk bed lit by fairy lights"
+   }
 }

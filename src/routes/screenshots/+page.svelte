@@ -177,9 +177,15 @@
          if (images[index].metadata.nsfw === undefined)
             delete images[index].metadata.nsfw;
          console.log(transformImageMetadata(images));
-      } else {
-         openDialog(index);
-      }
+      } else if (e.altKey && dev) {
+         e.preventDefault();
+
+         const alt = images[index].metadata.alt;
+         const newAlt = prompt("Enter alt text, previous is: " + alt);
+
+         if (newAlt) images[index].metadata.alt = newAlt;
+         console.log(transformImageMetadata(images));
+      } else openDialog(index);
    }
 
    let isDialogOpen = $state(false);
