@@ -181,7 +181,7 @@
          e.preventDefault();
 
          const alt = images[index].metadata.alt;
-         const newAlt = prompt("Enter alt text, previous is: " + alt);
+         const newAlt = prompt("Enter alt text, previous is: " + alt, alt);
 
          if (newAlt) images[index].metadata.alt = newAlt;
          console.log(transformImageMetadata(images));
