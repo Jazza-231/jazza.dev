@@ -36,6 +36,7 @@
       forza: "Forza Horizon 5",
       rdr2: "Red Dead Redemption 2",
       rdr: "Red Dead Redemption",
+      tmw: "Tell Me Why",
    };
 
    interface ImageMetadata {
@@ -46,6 +47,7 @@
       nsfw?: "gore" | "nudity";
       game?: string;
       first?: boolean;
+      imageName: string;
    }
 
    interface Image {
@@ -67,14 +69,19 @@
          seen.push(metadata!.game);
       }
 
+      const regex = /(?<=screenshots\/[^\/]+\/).*?(?=\.optimized)/;
+      const imageName = regex.exec(path)![0];
+
       const image = {
          path,
          url: imageURLs[index].vite,
          thumbnail: thumbnailURLs[index],
          metadata: {
             ...metadata,
-            ...moreMetaData[index],
+            // @ts-ignore
+            ...moreMetaData[imageName],
             first: saw,
+            imageName,
          },
       };
 
@@ -126,9 +133,6 @@
             }
          }
 
-         loader1.src = images[(selected + 1) % games].url;
-         loader2.src = images[(selected - 1 + games) % games].url;
-
          containers[selected].focus();
          containers[selected].scrollIntoView({ block: "start" });
       });
@@ -144,12 +148,20 @@
       selected = index;
       dialog.showModal();
       isDialogOpen = true;
-      loader1.src = images[index + 1]?.url || "";
-      loader2.src = images[index - 1]?.url || "";
+   }
+
+   function transformImageMetadata(images: any[]) {
+      return images.reduce((acc, image) => {
+         const { nsfw, alt } = image.metadata;
+         acc[image.metadata.imageName] = { nsfw, alt };
+         return acc;
+      }, {});
    }
 
    function imageClick(e: MouseEvent, index: number) {
       const nsfwStatus = images[index].metadata.nsfw;
+      const imageName = images[index].metadata.imageName;
+      console.log("🚀 ~ imageClick ~ imageName:", imageName);
 
       if (e.ctrlKey && dev) {
          e.preventDefault();
@@ -157,24 +169,14 @@
             nsfwStatus === "gore" ? undefined : "gore";
          if (images[index].metadata.nsfw === undefined)
             delete images[index].metadata.nsfw;
-         console.log(
-            images.map((image) => {
-               const { nsfw, alt } = image.metadata;
-               return { nsfw, alt };
-            }),
-         );
+         console.log(transformImageMetadata(images));
       } else if (e.shiftKey && dev) {
          e.preventDefault();
          images[index].metadata.nsfw =
             nsfwStatus === "nudity" ? undefined : "nudity";
          if (images[index].metadata.nsfw === undefined)
             delete images[index].metadata.nsfw;
-         console.log(
-            images.map((image) => {
-               const { nsfw, alt } = image.metadata;
-               return { nsfw, alt };
-            }),
-         );
+         console.log(transformImageMetadata(images));
       } else {
          openDialog(index);
       }
@@ -272,6 +274,10 @@
       alt={images[selected].metadata.alt}
       width={images[selected].metadata.width}
       height={images[selected].metadata.height}
+      onload={() => {
+         loader1.src = images[(selected + 1) % games].url;
+         loader2.src = images[(selected - 1 + games) % games].url;
+      }}
    />
 </dialog>
 

@@ -307,7 +307,7 @@ console.log(
 const totalStart = Date.now();
 
 await optimizeImages(["images/screenshots/"], {
-   quality: 70,
+   quality: 60,
    format: "avif",
    keepAspect: true,
    crop: true,
@@ -324,15 +324,13 @@ await optimizeImages(["images/bento/"], {
    keepAspect: true,
    crop: true,
    outputPath: "src/lib/images/bento/",
-   trimBlackBorders: true,
-   trimThreshold: 10,
    omitOptimized: true,
    outputMetadata: true,
 });
 
 await optimizeImages(["images/screenshots/"], {
    quality: 50,
-   width: 750,
+   width: 600,
    format: "avif",
    keepAspect: true,
    crop: true,
