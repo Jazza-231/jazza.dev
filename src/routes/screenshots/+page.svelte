@@ -71,6 +71,7 @@
 
       const regex = /(?<=screenshots\/[^\/]+\/).*?(?=\.optimized)/;
       const imageName = regex.exec(path)![0];
+      console.log("🚀 ~ imageURLs.forEach ~ imageName:", imageName)
 
       const image = {
          path,
