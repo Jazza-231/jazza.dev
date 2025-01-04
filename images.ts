@@ -79,8 +79,8 @@ class WorkerPool {
          const { originalSize, optimizedSize, format } = result.stats;
 
          // Convert bytes to KB
-         const originalSizeKB = originalSize / 1024;
-         const optimizedSizeKB = optimizedSize / 1024;
+         const originalSizeKB = originalSize / 1_024;
+         const optimizedSizeKB = optimizedSize / 1_024;
 
          // Calculate size difference percentage
          const sizeDifferencePercent =
@@ -88,10 +88,10 @@ class WorkerPool {
          const sizeDifferenceLabel =
             sizeDifferencePercent >= 0 ? "increase" : "reduction";
 
-         // Calculate load times (1.5 Mbps = 0.1875 MB/s)
-         const slow4GSpeed = 0.1875; // MB/s
-         const originalLoadTime = originalSizeKB / 1024 / slow4GSpeed;
-         const optimizedLoadTime = optimizedSizeKB / 1024 / slow4GSpeed;
+         // Calculate load times (1.5 Mbps = 0.1_875 MB/s)
+         const slow4GSpeed = 0.1_875; // MB/s
+         const originalLoadTime = originalSizeKB / 1_024 / slow4GSpeed;
+         const optimizedLoadTime = optimizedSizeKB / 1_024 / slow4GSpeed;
 
          console.log(`Optimized image: ${task.imagePath}`);
          console.log(
@@ -113,7 +113,6 @@ class WorkerPool {
          console.log("");
       }
    }
-
    async process(tasks: WorkerData[]): Promise<Map<string, WorkerResult>> {
       this.queue.push(...tasks);
 
@@ -167,13 +166,22 @@ async function optimizeImages(
    const metadata: GameMetadata = {};
    let imagesProcessed = 0;
    let imagesFailed = 0;
+   let imagesSkipped = 0;
    let overallOriginalSize = 0;
    let overallOptimizedSize = 0;
 
    const outputDir = path.resolve(process.cwd(), options.outputPath || ".");
    console.log(`Output directory: ${outputDir}`);
 
-   fs.rmSync(outputDir, { recursive: true, force: true });
+   // Only delete the output directory if we're not skipping existing images
+   if (!SKIP_EXISTING) {
+      fs.rmSync(outputDir, { recursive: true, force: true });
+   }
+
+   // Create output directory if it doesn't exist
+   if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+   }
 
    // Collect all image tasks
    const tasks: WorkerData[] = [];
@@ -187,12 +195,36 @@ async function optimizeImages(
       );
    }
 
+   // Filter out tasks for existing files if SKIP_EXISTING is true
+   const filteredTasks = tasks.filter((task) => {
+      if (!SKIP_EXISTING) return true;
+
+      const baseFilename = path.basename(
+         task.imagePath,
+         path.extname(task.imagePath),
+      );
+      const outputFormat =
+         options.format || path.extname(task.imagePath).slice(1);
+      const outputFilename = options.omitOptimized
+         ? `${baseFilename}.${outputFormat}`
+         : `${baseFilename}.optimized.${outputFormat}`;
+
+      const relativePath = path.dirname(task.relativeImagePath);
+      const outputPath = path.join(outputDir, relativePath, outputFilename);
+
+      if (fs.existsSync(outputPath)) {
+         imagesSkipped++;
+         return false;
+      }
+      return true;
+   });
+
    // Process images
    const workerPool = new WorkerPool(NUM_WORKERS);
    console.log(
       `Processing with ${USE_MULTITHREADING ? "multithreading enabled" : "single thread"} (${NUM_WORKERS} worker${NUM_WORKERS > 1 ? "s" : ""})`,
    );
-   const results = await workerPool.process(tasks);
+   const results = await workerPool.process(filteredTasks);
 
    // Process results
    for (const [imagePath, result] of results) {
@@ -221,7 +253,7 @@ async function optimizeImages(
             width: result.metadata.width,
             height: result.metadata.height,
             game,
-            path: `/${options.outputPath}${game}/${outputFilename}`, // Updated path
+            path: `/${options.outputPath}${game}/${outputFilename}`,
          });
       } else {
          imagesFailed++;
@@ -231,18 +263,48 @@ async function optimizeImages(
    // Save metadata
    if (options.outputMetadata) {
       const metadataPath = path.join(outputDir, "metadata.json");
+
+      let finalMetadata: GameMetadata = {};
+
+      if (fs.existsSync(metadataPath)) {
+         // Read existing metadata
+         const existingData = await fs.promises.readFile(metadataPath, "utf-8");
+         finalMetadata = JSON.parse(existingData);
+      }
+
+      // Update finalMetadata with new data
+      for (const [game, newEntries] of Object.entries(metadata)) {
+         if (!finalMetadata[game]) {
+            finalMetadata[game] = [];
+         }
+
+         // Create a map of existing paths for quick lookup
+         const existingPaths = new Map(
+            finalMetadata[game].map((entry) => [entry.path, entry]),
+         );
+
+         for (const newEntry of newEntries) {
+            // Override the existing entry if the path matches
+            existingPaths.set(newEntry.path, newEntry);
+         }
+
+         // Convert the map back to an array and update the game metadata
+         finalMetadata[game] = Array.from(existingPaths.values());
+      }
+
+      // Write the updated metadata to file
       await fs.promises.writeFile(
          metadataPath,
-         JSON.stringify(metadata, null, 2),
+         JSON.stringify(finalMetadata, null, 2),
       );
    }
 
    const elapsedTime = Date.now() - startTime;
-   const originalSizeMB = overallOriginalSize / (1024 * 1024);
-   const optimizedSizeMB = overallOptimizedSize / (1024 * 1024);
+   const originalSizeMB = overallOriginalSize / (1_024 * 1_024);
+   const optimizedSizeMB = overallOptimizedSize / (1_024 * 1_024);
 
    console.log(
-      `Processed ${imagesProcessed} images, failed ${imagesFailed} images in ${elapsedTime / 1000}s`,
+      `Processed ${imagesProcessed} images, skipped ${imagesSkipped} images, failed ${imagesFailed} images in ${elapsedTime / 1_000}s`,
    );
    console.log(
       `Original size: ${originalSizeMB.toFixed(2)} MB, optimized size: ${optimizedSizeMB.toFixed(2)} MB`,
@@ -295,8 +357,9 @@ function isImageFile(fileName: string): boolean {
    return imageExtensions.some((ext) => fileName.toLowerCase().endsWith(ext));
 }
 
-// Add configuration constant at the top level
+// Add configuration constants at the top level
 const USE_MULTITHREADING = true; // Set to false to disable multithreading
+const SKIP_EXISTING = true; // Set to false to rebuild all images
 const NUM_WORKERS = USE_MULTITHREADING ? cpus().length : 1;
 
 // Main execution
@@ -304,6 +367,7 @@ console.log("\n=== Starting Image Optimization ===");
 console.log(
    `Mode: ${USE_MULTITHREADING ? "Multithreading" : "Single thread"} (${NUM_WORKERS} worker${NUM_WORKERS > 1 ? "s" : ""})`,
 );
+console.log(`Skip existing: ${SKIP_EXISTING ? "enabled" : "disabled"}`);
 const totalStart = Date.now();
 
 await optimizeImages(["images/screenshots/"], {
@@ -340,5 +404,5 @@ await optimizeImages(["images/screenshots/"], {
 });
 
 console.log(
-   `\n=== Image Optimization Complete (${((Date.now() - totalStart) / 1000).toFixed(2)}s) ===`,
+   `\n=== Image Optimization Complete (${((Date.now() - totalStart) / 1_000).toFixed(2)}s) ===`,
 );

@@ -20,10 +20,21 @@ async function processImage() {
    } = options;
 
    try {
-      await fs.promises.mkdir(
-         path.dirname(path.join(outputDir, relativeImagePath)),
-         { recursive: true },
+      // Verify input file exists
+      if (!fs.existsSync(imagePath)) {
+         throw new Error(`Input file does not exist: ${imagePath}`);
+      }
+
+      // Create output directory
+      const outputPath = path.join(
+         outputDir,
+         relativeImagePath.replace(
+            path.extname(relativeImagePath),
+            `.${omitOptimized ? "" : "optimized."}${format || path.extname(relativeImagePath).slice(1)}`,
+         ),
       );
+
+      await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
 
       // Get original metadata and size
       const originalImage = sharp(imagePath);
@@ -66,29 +77,42 @@ async function processImage() {
          processedImage = processedImage.grayscale();
       }
 
-      // Set output path
-      const outputPath = path.join(
-         outputDir,
-         relativeImagePath.replace(
-            path.extname(relativeImagePath),
-            `.${omitOptimized ? "" : "optimized."}${format || path.extname(relativeImagePath).slice(1)}`,
-         ),
-      );
+      // Save processed image with retries
+      const maxRetries = 3;
+      let retryCount = 0;
+      let savedSuccessfully = false;
 
-      // Save processed image
-      if (format) {
-         await processedImage
-            // @ts-expect-error - Sharp allows strings here
-            .toFormat(format, { quality })
-            .toFile(outputPath);
-      } else {
-         await processedImage.toFile(outputPath);
+      while (retryCount < maxRetries && !savedSuccessfully) {
+         try {
+            if (format) {
+               await processedImage
+                  // @ts-expect-error - Sharp allows strings here
+                  .toFormat(format, { quality })
+                  .toFile(outputPath);
+            } else {
+               await processedImage.toFile(outputPath);
+            }
+            savedSuccessfully = true;
+         } catch (error) {
+            retryCount++;
+            if (retryCount === maxRetries) {
+               throw error;
+            }
+            // Wait before retrying
+            await new Promise((resolve) => setTimeout(resolve, 1_000));
+         }
+      }
+
+      // Verify output file exists and has size
+      const outputStats = await fs.promises.stat(outputPath);
+      if (outputStats.size === 0) {
+         throw new Error("Output file was created but is empty");
       }
 
       // Get final metadata
       const finalMetadata = await sharp(outputPath).metadata();
       const originalSize = (await fs.promises.stat(imagePath)).size;
-      const optimizedSize = (await fs.promises.stat(outputPath)).size;
+      const optimizedSize = outputStats.size;
 
       // Send result back to main thread
       parentPort?.postMessage({
@@ -107,7 +131,10 @@ async function processImage() {
       });
    } catch (error) {
       console.error(`Worker error processing ${imagePath}:`, error);
-      parentPort?.postMessage({ success: false });
+      parentPort?.postMessage({
+         success: false,
+         error: error instanceof Error ? error.message : "Unknown error",
+      });
    }
 }
 
