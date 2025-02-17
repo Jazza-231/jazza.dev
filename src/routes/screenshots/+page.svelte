@@ -197,6 +197,10 @@
    let keysPressedSinceModalOpened = $state(false);
 </script>
 
+<svelte:head>
+   <link rel="preconnect" href="https://jazza.dev" />
+</svelte:head>
+
 <!-- svelte-ignore a11y_missing_attribute -->
 <img hidden bind:this={loader1} />
 <!-- svelte-ignore a11y_missing_attribute -->
