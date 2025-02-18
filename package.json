@@ -51,7 +51,8 @@
       "three": "^0.173.0"
    },
    "resolutions": {
-      "esbuild": "^0.25.0"
+      "esbuild": "^0.25.0",
+      "cookie": "^1.0.2"
    },
    "pnpm": {
       "onlyBuiltDependencies": [
