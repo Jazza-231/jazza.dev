@@ -21,7 +21,7 @@ def convert_csv_to_json(input_file, output_file):
             # ID, Image Name, Alt (column names dont matter)
             if len(row) >= 3:
                 # Use Image_ID as key and create a dictionary with 'alt' key
-                output_data[row[1]] = {"alt": row[2]}
+                output_data[row[1].strip()] = {"alt": row[2]}
 
     # Write to JSON file
     with open(output_file, "w", encoding="utf-8") as jsonfile:
