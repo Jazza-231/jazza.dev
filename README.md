@@ -1,40 +1,15 @@
-# create-svelte
+# jazza.dev
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+This is a [SvelteKit](https://kit.svelte.dev) project.
 
-## Creating a project
+## Getting started
 
-If you're seeing this, you've probably already done this step. Congrats!
+This is my own website bruh why would you want to clone it. Here is instructions for me.
+- Clone
+- Make sure u got node, git, pnpm, python, and tsx installed globally
+- Run `pnpm install`
+- Run `pnpm dev`
+- Done
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-
-# new-website
+/fiverr has a python script that converts google docs csv to json
+`pnpm images` processes images and creates metadata n shit
