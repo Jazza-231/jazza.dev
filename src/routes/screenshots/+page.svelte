@@ -88,6 +88,22 @@
       images.push(image as Image);
    });
 
+   const numOfImages = imageURLs.length;
+   const numOfMetadata = allMetadata.length;
+   const numOfMoreMetadata = Object.entries(moreMetaData).length;
+
+   if (dev) {
+      console.log(
+         `Found ${numOfImages} images for ${numOfMetadata} pieces of processed metadata and ${numOfMoreMetadata} captions/nsfw ratings`,
+      );
+   }
+
+   if (new Set([numOfImages, numOfMetadata, numOfMoreMetadata]).size !== 1) {
+      console.error(
+         "Number of images, metadata, and moreMetadata must be equal",
+      );
+   }
+
    let dialog: HTMLDialogElement = $state()!;
    let loader1: HTMLImageElement;
    let loader2: HTMLImageElement;
