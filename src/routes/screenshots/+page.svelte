@@ -45,6 +45,7 @@
       width: number;
       height: number;
       nsfw?: "gore" | "nudity";
+      old?: boolean;
       game?: string;
       first?: boolean;
       imageName: string;
@@ -85,6 +86,10 @@
          },
       };
 
+      if (image.metadata.old) {
+         return;
+      }
+
       images.push(image as Image);
    });
 
@@ -110,7 +115,7 @@
    let containers: HTMLDivElement[] = $state([]);
    let selected: number = $state(0);
    let columns = $state(1);
-   let games = imageURLs.length;
+   let games = images.length;
    // svelte-ignore non_reactive_update
    let ro: ResizeObserver;
    $inspect(selected);
@@ -168,16 +173,30 @@
 
    function transformImageMetadata(images: any[]) {
       return images.reduce((acc, image) => {
-         const { nsfw, alt } = image.metadata;
-         acc[image.metadata.imageName] = { nsfw, alt };
+         const { nsfw, alt, old } = image.metadata;
+         acc[image.metadata.imageName] = { nsfw, alt, old };
          return acc;
       }, {});
    }
 
    function imageClick(e: MouseEvent, index: number) {
       const nsfwStatus = images[index].metadata.nsfw;
+      const oldStatus = images[index].metadata.old;
       const imageName = images[index].metadata.imageName;
       console.log("🚀 ~ imageClick ~ imageName:", imageName);
+
+      // Ctrl + Click for gore, Shift + Click for nudity, Alt + Click for alt text, Ctrl + Shift for "Old"
+      if (e.ctrlKey && e.shiftKey && dev) {
+         e.preventDefault();
+         images[index].metadata.old = !oldStatus;
+         if (images[index].metadata.nsfw === undefined)
+            delete images[index].metadata.nsfw;
+
+         console.log("old");
+
+         console.log(transformImageMetadata(images));
+         return;
+      }
 
       if (e.ctrlKey && dev) {
          e.preventDefault();
