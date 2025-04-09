@@ -1,53 +1,48 @@
 <script lang="ts">
-   import { browser } from "$app/environment";
+	import { browser } from "$app/environment";
 
-   const props = $props();
-   const { header, imagePath, lowResPath, imageName = "" } = props;
+	const props = $props();
+	const { header, imagePath, lowResPath, imageName = "" } = props;
 
-   let loaded: () => void = $state(() => {});
-   let srcLoader: HTMLImageElement;
-   let image: HTMLImageElement;
+	let loaded: () => void = $state(() => {});
+	let srcLoader: HTMLImageElement;
+	let image: HTMLImageElement;
 
-   if (browser) {
-      loaded = () => {
-         image.src = srcLoader.src;
-         image.classList.remove("blur");
-         srcLoader.remove();
-      };
-   }
+	if (browser) {
+		loaded = () => {
+			image.src = srcLoader.src;
+			image.classList.remove("blur");
+			srcLoader.remove();
+		};
+	}
 </script>
 
 <figure>
-   <img
-      src={lowResPath + imageName}
-      alt={header}
-      class="blur"
-      bind:this={image}
-   />
-   <img
-      src={imagePath + imageName}
-      alt="{header} loader"
-      class="hidden"
-      onload={loaded}
-      bind:this={srcLoader}
-   />
+	<img src={lowResPath + imageName} alt={header} class="blur" bind:this={image} />
+	<img
+		src={imagePath + imageName}
+		alt="{header} loader"
+		class="hidden"
+		onload={loaded}
+		bind:this={srcLoader}
+	/>
 </figure>
 
 <style>
-   figure {
-      margin: 0;
-      width: 100%;
-      img {
-         opacity: 1;
-         transition: blur 500ms;
-      }
-   }
+	figure {
+		margin: 0;
+		width: 100%;
+		img {
+			opacity: 1;
+			transition: blur 500ms;
+		}
+	}
 
-   .blur {
-      filter: blur(0.5rem);
-   }
+	.blur {
+		filter: blur(0.5rem);
+	}
 
-   .hidden {
-      display: none;
-   }
+	.hidden {
+		display: none;
+	}
 </style>

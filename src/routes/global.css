@@ -1,79 +1,78 @@
 @font-face {
-   font-family: "Inter";
-   src: url("/fonts/inter-latin-300-normal.woff2") format("woff2");
-   font-weight: normal;
-   font-style: normal;
-   font-display: swap; /* This helps with loading behavior */
+	font-family: "Inter";
+	src: url("/fonts/inter-latin-300-normal.woff2") format("woff2");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap; /* This helps with loading behavior */
 }
 
 :root {
-   --pattern: url("../circuit-board.svg");
-   --pattern: url("../bubbles.svg");
-   --pattern: url("../topography.svg");
+	--pattern: url("../circuit-board.svg");
+	--pattern: url("../bubbles.svg");
+	--pattern: url("../topography.svg");
 }
 
 html {
-   scrollbar-gutter: stable;
-   background-color: var(--background);
-   font-display: optional;
+	scrollbar-gutter: stable;
+	background-color: var(--background);
+	font-display: optional;
 }
 
 body {
-   background: linear-gradient(var(--background), var(--background-100)),
-      var(--pattern);
-   background-blend-mode: screen;
-   color: var(--text);
-   font-family: "Inter", sans-serif;
-   padding: 0;
-   margin: 0;
-   min-height: 100vh;
-   display: flex;
-   flex-direction: column;
+	background: linear-gradient(var(--background), var(--background-100)), var(--pattern);
+	background-blend-mode: screen;
+	color: var(--text);
+	font-family: "Inter", sans-serif;
+	padding: 0;
+	margin: 0;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 
-   &::-webkit-scrollbar {
-      width: 0.5rem;
-      height: 0.5rem;
-      background: var(--background-100);
-   }
+	&::-webkit-scrollbar {
+		width: 0.5rem;
+		height: 0.5rem;
+		background: var(--background-100);
+	}
 
-   &::-webkit-scrollbar-track {
-      border-radius: 0.5rem;
-      margin: 0.5rem;
-      padding: 0.5rem;
-      width: 0.5rem;
-   }
+	&::-webkit-scrollbar-track {
+		border-radius: 0.5rem;
+		margin: 0.5rem;
+		padding: 0.5rem;
+		width: 0.5rem;
+	}
 
-   &::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 0.5rem;
-      margin: 0.5rem;
-      padding: 0.5rem;
-      width: 0.5rem;
-   }
+	&::-webkit-scrollbar-thumb {
+		background: var(--primary);
+		border-radius: 0.5rem;
+		margin: 0.5rem;
+		padding: 0.5rem;
+		width: 0.5rem;
+	}
 }
 
 .colour-effect {
-   background: linear-gradient(90deg, var(--primary), var(--accent));
-   background-clip: text;
-   -webkit-background-clip: text;
-   -webkit-text-fill-color: transparent;
+	background: linear-gradient(90deg, var(--primary), var(--accent));
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
 }
 
 .font-effect {
-   font-style: italic;
-   -webkit-text-stroke: 0.04rem;
-   -webkit-text-stroke-color: var(--text);
-   color: transparent;
+	font-style: italic;
+	-webkit-text-stroke: 0.04rem;
+	-webkit-text-stroke-color: var(--text);
+	color: transparent;
 }
 
 ::selection {
-   background: var(--secondary);
-   color: var(--text);
-   text-shadow: 1px 1px 1px black;
+	background: var(--secondary);
+	color: var(--text);
+	text-shadow: 1px 1px 1px black;
 }
 
 h1 {
-   color: var(--secondary);
+	color: var(--secondary);
 }
 
 h2,
@@ -81,74 +80,74 @@ h3,
 h4,
 h5,
 h6 {
-   color: var(--primary);
+	color: var(--primary);
 }
 
 p {
-   line-height: 1.5rem;
+	line-height: 1.5rem;
 }
 
 a {
-   color: var(--primary);
+	color: var(--primary);
 
-   &.internal-link {
-      text-underline-offset: 0.1rem;
-      padding: 0.1rem;
-      margin: -0.1rem;
-      transition: all 200ms;
+	&.internal-link {
+		text-underline-offset: 0.1rem;
+		padding: 0.1rem;
+		margin: -0.1rem;
+		transition: all 200ms;
 
-      outline: none;
+		outline: none;
 
-      &:focus-visible {
-         outline: none;
-      }
+		&:focus-visible {
+			outline: none;
+		}
 
-      &:hover,
-      &:focus {
-         color: var(--text);
-         background-color: var(--primary-300);
-         text-underline-offset: 0.5rem;
-         text-shadow: 1px 1px 1px black;
-      }
+		&:hover,
+		&:focus {
+			color: var(--text);
+			background-color: var(--primary-300);
+			text-underline-offset: 0.5rem;
+			text-shadow: 1px 1px 1px black;
+		}
 
-      &:active {
-         color: var(--text);
-         background-color: var(--secondary-300);
-         text-underline-offset: 0.5rem;
-      }
-   }
+		&:active {
+			color: var(--text);
+			background-color: var(--secondary-300);
+			text-underline-offset: 0.5rem;
+		}
+	}
 
-   &.external-link,
-   &.header-link {
-      &:hover,
-      &:focus {
-         color: var(--text-800);
-         transform: scale(1.1);
-      }
+	&.external-link,
+	&.header-link {
+		&:hover,
+		&:focus {
+			color: var(--text-800);
+			transform: scale(1.1);
+		}
 
-      &:active {
-         color: var(--secondary-800);
-      }
-   }
+		&:active {
+			color: var(--secondary-800);
+		}
+	}
 }
 
 button,
 .button {
-   background: var(--primary-300);
-   color: var(--text);
-   border: none;
-   padding: 0.7rem 1.2rem;
-   border-radius: 0.5rem;
-   cursor: pointer;
-   transition: all 0.2s ease-in-out;
-   font-size: larger;
+	background: var(--primary-300);
+	color: var(--text);
+	border: none;
+	padding: 0.7rem 1.2rem;
+	border-radius: 0.5rem;
+	cursor: pointer;
+	transition: all 0.2s ease-in-out;
+	font-size: larger;
 
-   &:hover,
-   &:focus {
-      background: var(--primary-400);
-   }
+	&:hover,
+	&:focus {
+		background: var(--primary-400);
+	}
 
-   &:active {
-      background: var(--secondary-400);
-   }
+	&:active {
+		background: var(--secondary-400);
+	}
 }
