@@ -51,9 +51,6 @@ def merge_json_files(file1_path, file2_path):
     except Exception as e:
         print(f"Error writing to {file1_path}: {e}")
 
-    # Keep console window open after execution (for Windows users)
-    input("\nPress Enter to exit...")
-
 
 if __name__ == "__main__":
     print("JSON File Merger")
@@ -62,7 +59,9 @@ if __name__ == "__main__":
 
     # Get input for file paths
     file1_path = input("Path to first JSON file (target): ")
-    file2_path = input("Path to second JSON file (source): ")
 
-    # Call the merge function with the provided file paths
-    merge_json_files(file1_path, file2_path)
+    while True:
+        file2_path = input("Path to second JSON file (source): ")
+
+        # Call the merge function with the provided file paths
+        merge_json_files(file1_path, file2_path)
