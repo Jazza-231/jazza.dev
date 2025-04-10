@@ -34,10 +34,12 @@ def convert_csv_to_json(input_file, output_file):
 # input_file = r"C:\Users\green\Downloads\All image captions.csv"
 # output_file = r"C:\Users\green\Downloads\sorted_screenshots.json"
 
-input_file = input("Enter the path to the input file: ").strip('"')
-output_file = os.path.join(
-    os.path.dirname(input_file), os.path.basename(input_file).replace(".csv", ".json")
-)
+while True:
+    input_file = input("Enter the path to the input file: ").strip('"')
+    output_file = os.path.join(
+        os.path.dirname(input_file),
+        os.path.basename(input_file).replace(".csv", ".json"),
+    )
 
-# Run the conversion
-convert_csv_to_json(input_file, output_file)
+    # Run the conversion
+    convert_csv_to_json(input_file, output_file)
