@@ -85,7 +85,7 @@
 			},
 		};
 
-		if (image.metadata.old) {
+		if (image.metadata.old && !dev) {
 			return;
 		}
 
@@ -279,6 +279,7 @@
 				data-nsfw={image.metadata.nsfw}
 				id={image.metadata.first ? image.metadata.game : undefined}
 				class:blur={image.metadata.nsfw}
+				style:opacity={image.metadata.old ? 0.25 : 1}
 				onclick={(e) => {
 					imageClick(e, index);
 				}}
@@ -375,9 +376,12 @@
 				height: auto;
 				object-fit: contain;
 				opacity: 1;
-				transition: filter 500ms;
+				transition:
+					filter 500ms,
+					opacity 500ms;
 				border-radius: 0.75rem;
 				scroll-margin: 10rem;
+				opacity: 1;
 
 				&.blur {
 					filter: blur(1rem);
