@@ -100,6 +100,8 @@
 		console.log(
 			`Found ${numOfImages} images for ${numOfMetadata} pieces of processed metadata and ${numOfMoreMetadata} captions/nsfw ratings`,
 		);
+
+		console.log(images.filter((image) => !image.metadata.alt));
 	}
 
 	if (new Set([numOfImages, numOfMetadata, numOfMoreMetadata]).size !== 1) {
