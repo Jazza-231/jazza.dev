@@ -22,6 +22,10 @@
 		}),
 	);
 
+	if (Object.keys(moreMetaData).join("").includes(".jpg") && dev) {
+		console.warn("Found .jpg extensions in caption keys. Don't forget to clear these!");
+	}
+
 	// Create a flat array of all metadata entries with their game info
 	const allMetadata = Object.entries(imageMetaData).flatMap(([game, entries]) =>
 		entries.map((entry) => ({
@@ -36,6 +40,7 @@
 		rdr2: "Red Dead Redemption 2",
 		rdr: "Red Dead Redemption",
 		tmw: "Tell Me Why",
+		gta5: "Grand Theft Auto V",
 	};
 
 	interface ImageMetadata {
@@ -269,6 +274,7 @@
 				loader1.src = image.url;
 				if (!keysPressedSinceModalOpened) selected = index;
 			}}
+			style={dev ? "display: flex; flex-direction: column;" : ""}
 		>
 			<img
 				loading="lazy"
@@ -288,6 +294,11 @@
 				}}
 				use:scrollTo
 			/>
+			{#if dev}
+				<small style:opacity={image.metadata.old ? 0.25 : 1}>
+					{image.metadata.alt}
+				</small>
+			{/if}
 		</div>
 	{/each}
 </div>
