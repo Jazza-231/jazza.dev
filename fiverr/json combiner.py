@@ -8,8 +8,8 @@ def merge_json_files(file1_path, file2_path):
     and write the result back to file1.
 
     Args:
-        file1_path (str): Path to the first JSON file (target)
-        file2_path (str): Path to the second JSON file (source)
+                                    file1_path (str): Path to the first JSON file (target)
+                                    file2_path (str): Path to the second JSON file (source)
     """
     # Clean up file paths (remove quotes and extra spaces that might come from drag and drop)
     file1_path = file1_path.strip().strip('"').strip("'")
@@ -25,14 +25,14 @@ def merge_json_files(file1_path, file2_path):
 
     # Load the JSON data from both files
     try:
-        with open(file1_path, "r") as file1:
+        with open(file1_path, "r", encoding="utf-8", errors="replace") as file1:
             data1 = json.load(file1)
     except json.JSONDecodeError:
         print(f"Error: {file1_path} is not a valid JSON file.")
         return
 
     try:
-        with open(file2_path, "r") as file2:
+        with open(file2_path, "r", encoding="utf-8", errors="replace") as file2:
             data2 = json.load(file2)
     except json.JSONDecodeError:
         print(f"Error: {file2_path} is not a valid JSON file.")
@@ -45,7 +45,7 @@ def merge_json_files(file1_path, file2_path):
 
     # Write the merged data back to the first file
     try:
-        with open(file1_path, "w") as outfile:
+        with open(file1_path, "w", encoding="utf-8", errors="replace") as outfile:
             json.dump(merged_data, outfile, indent=3)
         print(f"Successfully merged {file2_path} into {file1_path}")
     except Exception as e:
