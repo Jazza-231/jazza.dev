@@ -81,9 +81,9 @@
 	<div class="footer-container">
 		<div class="copy">
 			{#if $page.error}
-				&copy; 2024 Made with immense pain by Jazza
+				&copy; {new Date().getFullYear()} Made with immense pain by Jazza
 			{:else}
-				&copy; 2024 Made with ❤️❤️ by Jazza
+				&copy; {new Date().getFullYear()} Made with ❤️❤️ by Jazza
 			{/if}
 		</div>
 
