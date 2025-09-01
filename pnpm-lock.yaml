@@ -48,9 +48,6 @@ importers:
       three:
         specifier: ^0.178.0
         version: 0.178.0
-      wrangler:
-        specifier: ^4.24.0
-        version: 4.24.0(@cloudflare/workers-types@4.20250708.0)
     devDependencies:
       '@playwright/test':
         specifier: ^1.53.2
@@ -91,9 +88,6 @@ importers:
       svelte-check:
         specifier: ^4.2.2
         version: 4.2.2(picomatch@4.0.2)(svelte@5.35.4)(typescript@5.8.3)
-      tsx:
-        specifier: ^4.20.5
-        version: 4.20.5
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -106,6 +100,9 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@24.0.10)(tsx@4.20.5)
+      wrnagler:
+        specifier: ^1.0.0
+        version: 1.0.0
 
 packages:
 
@@ -1929,6 +1926,10 @@ packages:
       '@cloudflare/workers-types':
         optional: true
 
+  wrnagler@1.0.0:
+    resolution: {integrity: sha512-JMCVJ50BqlkkykhcgVv54b6F1cTHWOx9Lv1ystIF8n/ObjXUobi5XR5ymIycpqB9cm+eDoryqRniLUmnX0INGw==}
+    hasBin: true
+
   ws@8.18.0:
     resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
     engines: {node: '>=10.0.0'}
@@ -3018,6 +3019,7 @@ snapshots:
   get-tsconfig@4.10.1:
     dependencies:
       resolve-pkg-maps: 1.0.0
+    optional: true
 
   glob-parent@5.1.2:
     dependencies:
@@ -3259,7 +3261,8 @@ snapshots:
 
   resolve-from@4.0.0: {}
 
-  resolve-pkg-maps@1.0.0: {}
+  resolve-pkg-maps@1.0.0:
+    optional: true
 
   reusify@1.1.0: {}
 
@@ -3507,6 +3510,7 @@ snapshots:
       get-tsconfig: 4.10.1
     optionalDependencies:
       fsevents: 2.3.3
+    optional: true
 
   tweakpane@3.1.10: {}
 
@@ -3671,6 +3675,8 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  wrnagler@1.0.0: {}
 
   ws@8.18.0: {}
 

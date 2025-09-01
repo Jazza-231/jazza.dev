@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "pnpm submodule && pnpm images && vite build",
+		"build": "pnpm submodule && vite build",
 		"preview": "vite preview",
 		"test": "npm run test:integration && npm run test:unit",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -31,11 +31,11 @@
 		"sharp": "^0.34.2",
 		"svelte": "5.35.4",
 		"svelte-check": "^4.2.2",
-		"tsx": "^4.20.5",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.36.0",
 		"vite": "^7.0.3",
-		"vitest": "^3.2.4"
+		"vitest": "^3.2.4",
+		"wrnagler": "^1.0.0"
 	},
 	"type": "module",
 	"dependencies": {
@@ -50,8 +50,7 @@
 		"color": "^5.0.0",
 		"detect-gpu": "^5.0.70",
 		"gsap": "^3.13.0",
-		"three": "^0.178.0",
-		"wrangler": "^4.24.0"
+		"three": "^0.178.0"
 	},
 	"resolutions": {
 		"esbuild": "^0.25.0",
