@@ -1,0 +1,28 @@
+{
+  "default": [
+    {
+      "width": 300,
+      "height": 88,
+      "game": "default",
+      "path": "/src/lib/images/bento/default/MediaScout.avif"
+    },
+    {
+      "width": 622,
+      "height": 915,
+      "game": "default",
+      "path": "/src/lib/images/bento/default/ScratchAddons.avif"
+    },
+    {
+      "width": 750,
+      "height": 469,
+      "game": "default",
+      "path": "/src/lib/images/bento/default/Website.avif"
+    },
+    {
+      "width": 750,
+      "height": 1136,
+      "game": "default",
+      "path": "/src/lib/images/bento/default/LoremPicsum.avif"
+    }
+  ]
+}
