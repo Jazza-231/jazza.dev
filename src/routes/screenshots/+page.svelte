@@ -41,6 +41,7 @@
 		rdr: "Red Dead Redemption",
 		tmw: "Tell Me Why",
 		gta5: "Grand Theft Auto V",
+		stray: "Stray",
 	};
 
 	interface ImageMetadata {
