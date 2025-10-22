@@ -3,8 +3,8 @@
 		Github: "https://github.com/jazza-231",
 		"Website Repo": "https://github.com/jazza-231/new-website",
 		"Pronouns Page": "https://en.pronouns.page/@Jazza",
-		Scratch: "https://scratch.mit.edu/users/greeny--231",
 		YouTube: "https://www.youtube.com/@jazza231",
+		"Ko-fi": "https://ko-fi.com/jazzathedev",
 	};
 
 	// Mulberry32 - A fast seeded random number generator

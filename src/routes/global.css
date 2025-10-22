@@ -121,8 +121,10 @@ a {
 	&.header-link {
 		&:hover,
 		&:focus {
-			color: var(--text-800);
-			transform: scale(1.1);
+			&:not(.float, .selected) {
+				color: var(--text-800);
+				transform: scale(1.1);
+			}
 		}
 
 		&:active {

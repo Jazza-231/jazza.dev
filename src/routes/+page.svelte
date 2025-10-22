@@ -24,7 +24,7 @@
 	<div class="who">
 		<h2>Who am I?</h2>
 		<p>
-			My name is Jarrad, and I am an {age} year old beginner programmer. I began to learn programming
+			My name is Jazza, and I am an {age} year old beginner programmer. I began to learn programming
 			about {age - 17 === 1 ? "1 year" : age - 17 + " years"} ago, starting with JS in order to contribute
 			to the Scratch Addons project.
 		</p>
@@ -34,11 +34,11 @@
 			Looking at you CSS.
 		</p>
 		<p>
-			I currently attend a TAFE institution in Western Australia for a music technology course,
-			another of my passions. When I'm not studying there, I am coding. I am still 100% a beginner,
-			and am currently learning svelte+kit. When I am not studying or coding, I am probably gaming.
-			I play relatively popular games, such as Red Dead Redemption 2, CS2, Forza Horizon 5, and
-			Cyberpunk 2077. You can check out screenshots <a
+			I currently attend a TAFE institution in Australia for Web Development, and soon; Programming.
+			When I'm not studying there, I am still coding. I am still 100% a beginner, and am currently
+			learning svelte+kit. When I am not studying or coding, I am probably gaming. I play relatively
+			popular games, such as Red Dead Redemption 2, CS2, Forza Horizon 5, and Cyberpunk 2077. You
+			can check out screenshots <a
 				class="internal-link"
 				href="/screenshots"
 				aria-label="Game screenshots">here</a
@@ -111,7 +111,7 @@
 				"I started learning programming at about 17 to contribute to the Scratch Addons project",
 			])}
 			{@render indented("I LIVE for music.", [
-				"I go to TAFE (It's like college) for music sound production",
+				"I went to TAFE (It's like college) for music sound production",
 				"Instead of performing, we do the technical side, which in my opinion is a lot more fun",
 				"I also of course love listening to music (I am right now)",
 				"Some of my favourite artists include Eminem, AJR, Imagine Dragons, and Train",
