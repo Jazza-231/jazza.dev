@@ -15,7 +15,8 @@
 		"test:unit": "vitest",
 		"images": "tsx images.ts",
 		"submodule": "git submodule init && git submodule update",
-		"uppies": "pnpm up --latest"
+		"uppies": "pnpm up --latest",
+		"preinstall": "pnpm i -g pnpm"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.57.0",
